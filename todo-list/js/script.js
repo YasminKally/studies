@@ -5,6 +5,7 @@ const todoList = document.querySelector('#todoList')
 const editForm = document.querySelector('#editForm')
 const editInput = document.querySelector('#editInput')
 const cancelEdit = document.querySelector('#cancelEdit')
+const selectFilter = document.querySelector('#selectFilter')
 
 let oldInputValue;
 
@@ -66,6 +67,27 @@ const updateTodo = (text) => {
     })
 }
 
+const filterTodos = (filterValue) => {
+    const todos = document.querySelectorAll('.todo')
+
+    switch (filterValue) {
+        case 'all':
+            todos.forEach((todo) => (todo.style.display = 'flex'));
+            break;
+
+        case 'done':
+            todos.forEach((todo) => todo.classList.contains('done') ? (todo.style.display = 'flex') : (todo.style.display = 'none'));
+            break;
+
+        case 'todo':
+            todos.forEach((todo) => !todo.classList.contains('done') ? (todo.style.display = 'flex') : (todo.style.display = 'none'));
+            break;
+
+        default:
+            break;
+    }
+};
+
 // Eventos
 todoForm.addEventListener('submit', (e) => {
     e.preventDefault();
@@ -122,6 +144,12 @@ editForm.addEventListener('submit', (e) => {
     }
 
     toggleForms();
+});
+
+selectFilter.addEventListener('change', (e) => {
+    const filterValue = e.target.value;
+    
+    filterTodos(filterValue);
 });
 
 // Local Storage

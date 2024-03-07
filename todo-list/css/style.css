@@ -93,7 +93,7 @@ input, select {
 #toolbar {
     padding: 1rem;
     border-bottom: 1px solid #ccc;
-    display: none;
+    display: flex;
 }
 
 #toolbar h4 {
