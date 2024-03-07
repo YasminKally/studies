@@ -5,6 +5,8 @@ const todoList = document.querySelector('#todoList')
 const editForm = document.querySelector('#editForm')
 const editInput = document.querySelector('#editInput')
 const cancelEdit = document.querySelector('#cancelEdit')
+const searchInput = document.querySelector('#searchInput')
+const eraseButton = document.querySelector('#eraseButton')
 const selectFilter = document.querySelector('#selectFilter')
 
 let oldInputValue;
@@ -35,9 +37,6 @@ const saveTodo = (text, done = 0, save = 1) => {
 
     todoList.appendChild(todo);
 
-    todoInput.value = '';
-    todoInput.focus();
-
     if (done) {
         todo.classList.add('done');
     }
@@ -45,13 +44,16 @@ const saveTodo = (text, done = 0, save = 1) => {
     if (save) {
         saveToLocalStorage({text, done: 0})
     }
-} 
+
+    todoInput.value = '';
+    todoInput.focus();
+};
 
 const toggleForms = () => {
     editForm.classList.toggle('hide')
     todoForm.classList.toggle('hide')
     todoList.classList.toggle('hide')
-}
+};
 
 const updateTodo = (text) => {
     const todos = document.querySelectorAll('.todo')
@@ -64,8 +66,22 @@ const updateTodo = (text) => {
 
             editTodoLocalStorage(oldInputValue, text)
         }
-    })
-}
+    });
+};
+
+const getSearchedTodos = (search) => {
+    const todos = document.querySelectorAll('.todo');
+
+    todos.forEach((todo) => {
+        const todoTittle = todo.querySelector('h3').innerText.toLowerCase();
+
+        todo.style.display = 'flex';
+
+        if (!todoTittle.includes(search)) {
+            todo.style.display = 'none'
+        }
+    }); 
+};
 
 const filterTodos = (filterValue) => {
     const todos = document.querySelectorAll('.todo')
@@ -146,6 +162,19 @@ editForm.addEventListener('submit', (e) => {
     toggleForms();
 });
 
+searchInput.addEventListener('keyup', (e) => {
+    const search =  e.target.value;
+
+    getSearchedTodos(search);
+});
+
+eraseButton.addEventListener('click', (e) => {
+    e.preventDefault();
+
+    searchInput.value = '';
+    searchInput.dispatchEvent(new Event ('keyup'));
+});
+
 selectFilter.addEventListener('change', (e) => {
     const filterValue = e.target.value;
     
@@ -171,7 +200,6 @@ const loadTodos = () => {
     todos.forEach((todo) => {
         saveTodo(todo.text, todo.done, 0);
     });
-
 };
 
 const updateTodoStatusLocalStorage = (todoText) => {
