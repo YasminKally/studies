@@ -65,14 +65,16 @@ input, select {
 }
 
 .container header {
+    display: flex;
+    justify-content: flex-end;
+    flex-wrap: wrap;
     text-align: center;
     padding: 0 1rem 1rem;
     border-bottom: 1px solid #ccc;
 }
 
-.container header > button {
-    position: relative;
-    left: 91%;
+.container header h1 {
+    flex-basis: 100%;
 }
 
 /*To Do Form*/
