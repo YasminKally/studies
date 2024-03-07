@@ -33,7 +33,7 @@ button:hover {
     color: whitesmoke;
 }
 
-button:hover > i {
+button:hover  i {
     color: whitesmoke;
 }
 
@@ -68,6 +68,11 @@ input, select {
     text-align: center;
     padding: 0 1rem 1rem;
     border-bottom: 1px solid #ccc;
+}
+
+.container header > button {
+    position: relative;
+    left: 20.7rem;
 }
 
 /*To Do Form*/
@@ -134,6 +139,10 @@ input, select {
     flex: 1;
 }
 
+#filter select:hover {
+    cursor: pointer;
+}
+
 /*To Do List*/
 .todo {
     display: flex;
@@ -154,7 +163,7 @@ input, select {
 }
 
 .done {
-    background-color: #395169;
+    background-color: #6d2d4d;
 }
 
 .done h3 {

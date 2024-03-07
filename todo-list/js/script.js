@@ -8,6 +8,7 @@ const cancelEdit = document.querySelector('#cancelEdit')
 const searchInput = document.querySelector('#searchInput')
 const eraseButton = document.querySelector('#eraseButton')
 const selectFilter = document.querySelector('#selectFilter')
+const deleteAll = document.querySelector('#deleteAll')
 
 let oldInputValue;
 
@@ -104,6 +105,14 @@ const filterTodos = (filterValue) => {
     }
 };
 
+const removeAll = () => {
+    const todos = document.querySelectorAll('.todo')
+    todos.forEach((todo) => todo.style.display = 'none')
+
+    removeAllFromLocalStorage();
+
+};
+
 // Eventos
 todoForm.addEventListener('submit', (e) => {
     e.preventDefault();
@@ -181,6 +190,11 @@ selectFilter.addEventListener('change', (e) => {
     filterTodos(filterValue);
 });
 
+deleteAll.addEventListener('click', (e) => {
+    e.preventDefault();
+    removeAll();
+});
+
 // Local Storage
 const getTodosLocalStorage = () => {
     const todos = JSON.parse(localStorage.getItem('todos')) || [];
@@ -221,6 +235,10 @@ const removeFromLocalStorage = (todoText) => {
     const filteredTodos = todos.filter((todo) => todo.text != todoText);
     
     localStorage.setItem('todos', JSON.stringify(filteredTodos))
+};
+
+const removeAllFromLocalStorage = () => {
+     localStorage.removeItem('todos');
 };
 
 // Start To Do List
