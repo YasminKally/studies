@@ -9,7 +9,7 @@ const cancelEdit = document.querySelector('#cancelEdit')
 let oldInputValue;
 
 // Funções
-const saveTodo = (text) => {
+const saveTodo = (text, done = 0, save = 1) => {
     const todo = document.createElement('div');
     todo.classList.add('todo');
 
@@ -34,8 +34,16 @@ const saveTodo = (text) => {
 
     todoList.appendChild(todo);
 
-    todoInput.value = ''
-    todoInput.focus()
+    todoInput.value = '';
+    todoInput.focus();
+
+    if (done) {
+        todo.classList.add('done');
+    }
+
+    if (save) {
+        saveToLocalStorage({text, done: 0})
+    }
 } 
 
 const toggleForms = () => {
@@ -52,6 +60,8 @@ const updateTodo = (text) => {
     
         if (todoTittle.innerText === oldInputValue) {
             todoTittle.innerText = text;
+
+            editTodoLocalStorage(oldInputValue, text)
         }
     })
 }
@@ -73,15 +83,19 @@ document.addEventListener('click', (e) => {
     let todoTittle;
 
     if (parentEl && parentEl.querySelector('h3')) {
-        todoTittle = parentEl.querySelector('h3').innerText;
+        todoTittle = parentEl.querySelector('h3').innerText || '';
     }
 
     if (targetEl.classList.contains('finishTodo')) {
         parentEl.classList.toggle('done');
+
+        updateTodoStatusLocalStorage(todoTittle);
     }
 
     if (targetEl.classList.contains('removeTodo')) {
         parentEl.remove();
+
+        removeFromLocalStorage(todoTittle);
     }
 
     if (targetEl.classList.contains('editTodo')) {
@@ -109,3 +123,50 @@ editForm.addEventListener('submit', (e) => {
 
     toggleForms();
 });
+
+// Local Storage
+const getTodosLocalStorage = () => {
+    const todos = JSON.parse(localStorage.getItem('todos')) || [];
+    return todos;
+};
+
+const saveToLocalStorage = (todo) => {
+    const todos = getTodosLocalStorage();
+
+    todos.push(todo);
+    localStorage.setItem('todos', JSON.stringify(todos));
+};
+
+const loadTodos = () => {
+    const todos = getTodosLocalStorage();
+
+    todos.forEach((todo) => {
+        saveTodo(todo.text, todo.done, 0);
+    });
+
+};
+
+const updateTodoStatusLocalStorage = (todoText) => {
+    const todos = getTodosLocalStorage();
+
+    todos.map((todo) => todo.text === todoText ? (todo.done = !todo.done) : null);
+    localStorage.setItem('todos', JSON.stringify(todos));
+};
+
+const editTodoLocalStorage = (todoOldText, todoNewText) => {
+    const todos = getTodosLocalStorage();
+
+    todos.map((todo) => todo.text === todoOldText ? (todo.text = todoNewText) : null);
+    localStorage.setItem('todos', JSON.stringify(todos))
+};
+
+const removeFromLocalStorage = (todoText) => {
+    const todos = getTodosLocalStorage();
+    const filteredTodos = todos.filter((todo) => todo.text != todoText);
+    
+    localStorage.setItem('todos', JSON.stringify(filteredTodos))
+};
+
+// Start To Do List
+
+loadTodos();
