@@ -11,12 +11,12 @@
 
 body {
     height: 92vh;
-    background: #000000;
+    background: #1f1f1f;
     background-size: cover;
 }
 
 button {
-    background-color: #000000;
+    background-color: #1f1f1f;
     color: hotpink;
     border: 2px solid hotpink;
     padding: .3rem .6rem;
@@ -44,7 +44,7 @@ button i {
 }
 
 input, select {
-    background-color: #000000;
+    background-color: #1f1f1f;
     border: 1px solid hotpink;
     padding: .25rem;
 }
@@ -61,7 +61,7 @@ input, select {
     padding: 1.5rem;
     border-radius: 15px;
     border: 2px solid hotpink;
-    background-color: #000000;
+    background-color: #1f1f1f;
 }
 
 .container header {
