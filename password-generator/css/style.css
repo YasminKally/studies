@@ -130,3 +130,44 @@ input:focus {
 #register-form input[type="submit"]:hover {
     opacity: 1;
 }
+
+/*Mobile*/
+
+@media screen and (max-width: 450px) {
+    html {
+        background: #ea02ff;
+    }
+
+    #register-container {
+        flex-direction: column;
+        box-shadow: none;
+        max-width: 350px;
+    }
+
+    #register-banner {
+        width: 100%;
+    }
+
+    #banner-layer {
+        justify-content: center;
+    }
+
+    #register-banner h1 {
+        font-size: 2rem;
+        word-spacing: normal;
+    }
+
+    #register-form {
+        width: 100%;
+    }
+
+    #register-form h2 {
+        font-size: 1.5rem;
+        margin-bottom: .5rem;
+    }
+
+    #register-form input[type="submit"] {
+        opacity: 1;
+        align-self: center;
+    }
+}
