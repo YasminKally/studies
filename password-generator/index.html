@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerador de Senha</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/script.js" defer></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="register-container">
+        <div id="register-banner">
+            <div id="banner-layer">
+                <h1>Seja Bem-vindo</h1>
+            </div>
+        </div>
+        <div id="register-form">
+            <h2>Crie sua Conta:</h2>
+            <p>Registre-se para utilizar todas as funcionalidades do sistema</p>
+            <div class="form-control">
+                <label for="name">Nome</label>
+                <input type="text" name="name" id="name" placeholder="Digite seu nome" autocomplete="off">
+            </div>
+            <div class="form-control">
+                <label for="email">E-mail</label>
+                <input type="text" name="email" id="email" placeholder="Digite seu e-mail" autocomplete="off">
+            </div>
+            <div class="form-control">
+                <label for="password">Senha</label>
+                <input type="text" name="password" id="password" placeholder="Digite a sua senha" autocomplete="off">
+            </div>
+            <p>
+                Quer ajuda para criar uma senha segura? <span id="generate-password">Clique aqui</span>
+            </p>
+            <div id="generated-password">
+                <p>Aqui está a sua senha:</p>
+                <h4></h4>
+            </div>
+            <div class="form-control">
+                <label for="confirmpassword">Confirmar</label>
+                <input type="text" name="confirmpassword" id="confirmpassword" placeholder="Confirme a sua senha" autocomplete="off">
+            </div>
+            <input type="submit" value="Cadastrar-se">
+        </div>
+    </div>
+</body>
+</html>
