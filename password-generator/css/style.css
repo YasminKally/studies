@@ -133,7 +133,7 @@ input:focus {
 
 /*Mobile*/
 
-@media screen and (max-width: 450px) {
+@media screen and (max-width: 720px) {
     html {
         background: #ea02ff;
     }
@@ -141,7 +141,8 @@ input:focus {
     #register-container {
         flex-direction: column;
         box-shadow: none;
-        max-width: 350px;
+        width: 90%;
+        max-width: 500px;
     }
 
     #register-banner {
