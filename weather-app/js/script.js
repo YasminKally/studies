@@ -13,12 +13,22 @@ const countryElement = document.querySelector('#country');
 const humidityElement = document.querySelector('#humidity span');
 const windElement = document.querySelector('#wind span');
 
-const weatherData = document.querySelector('#weather-data')
-const loader = document.querySelector('#loader')
+const weatherData = document.querySelector('#weather-data');
+const loader = document.querySelector('#loader');
+const errorMessage = document.querySelector('#error-message');
 
 // Funções
+const hideInfo = () => {
+    weatherData.classList.add('hide');
+    errorMessage.classList.add('hide');
+};
+
 const toggleLoader = () => {
     loader.classList.toggle('hide');
+};
+
+const showErrorMessage = () => {
+    errorMessage.classList.remove('hide')
 };
 
 const getWeatherData = async (city) => {
@@ -35,7 +45,14 @@ const getWeatherData = async (city) => {
 };
 
 const showWeatherData = async(city) => {
+    hideInfo();
+
     const data  = await getWeatherData(city);
+
+    if (data.cod === '404') {
+        showErrorMessage();
+        return;
+    }
 
     cityElement.innerText = data.name;
     tempElement.innerText = parseInt(data.main.temp);
