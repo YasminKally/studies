@@ -14,13 +14,22 @@ const humidityElement = document.querySelector('#humidity span');
 const windElement = document.querySelector('#wind span');
 
 const weatherData = document.querySelector('#weather-data')
+const loader = document.querySelector('#loader')
 
 // Funções
+const toggleLoader = () => {
+    loader.classList.toggle('hide');
+};
+
 const getWeatherData = async (city) => {
+    toggleLoader();
+
     const apiWeatherURL = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${apiKey}&lang=pt_br`;
 
     const res = await fetch(apiWeatherURL);
     const data = await res.json();
+
+    toggleLoader();
 
     return data;
 };

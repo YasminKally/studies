@@ -106,3 +106,19 @@ body {
     margin: .6rem;
     padding: .6rem;
 }
+
+#loader {
+    margin-top: 2rem;
+    margin-left: 45%;
+}
+
+#loader i {
+    font-size: 2rem;
+    animation: rotate 1.5s linear infinite;
+}
+
+@keyframes rotate {
+    to {
+        transform: rotate(360deg);
+    }
+}
