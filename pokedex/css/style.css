@@ -101,4 +101,14 @@ main {
     .pokedex {
         width: 85%;
     }
+
+    .form {
+        width: 50%;
+        left: 23%;
+    }
+
+    .buttons {
+        width: 50%;
+        left: 52%;
+    }
 }
