@@ -1,5 +1,3 @@
-<h1>STUDIES</h1>
-
 <h2>Projects:</h2>
 <ul>
     <li><a href="https://yasminkally.github.io/studies/calc/index.html">Calculator</a></li>
@@ -8,4 +6,5 @@
     <li><a href="https://yasminkally.github.io/studies/password-generator/index.html">Password Generator</a></li>
     <li><a href="https://yasminkally.github.io/studies/weather-app/index.html">Weather App</a></li>
     <li><a href="https://yasminkally.github.io/studies/pokedex/index.html">Pokedex</a></li>
+    <li><a href="https://yasminkally.github.io/studies/timer/index.html">Timer</a></li>
 </ul>
