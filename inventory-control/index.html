@@ -13,15 +13,30 @@
         <header>
             <h1>Inventory</h1>
         </header>
-        <main>
             <form id="item-form" autocomplete="off">
-                <input id="name-input" type="text" placeholder="Item's name" required>
-                <input id="minimum-input" type="number" placeholder="Minimum" required>
-                <input id="quantity-input" type="number" placeholder="Quantity" required>
-                <button class="btn" id="add-item-btn" type="submit">Add Item</button>
+                <p>Add to inventory: </p>
+                <div class="form-control">
+                    <input id="name-input" type="text" placeholder="Item's name" required>
+                    <input id="minimum-input" type="number" placeholder="Minimum" required>
+                    <input id="quantity-input" type="number" placeholder="Quantity" required>
+                    <button class="btn" id="add-item-btn" type="submit">Add Item</button>
+                </div>
             </form>
+
+            <form id="edit-form" class="hide">
+                <p>Edit the item: </p>
+                <div class="form-control">
+                    <input id="edit-name-input" type="text">
+                    <input id="edit-minimum-input" type="number">
+                    <input id="edit-quantity-input" type="number">
+                    <div id="edit-buttons">
+                        <button class="btn" id="confirm-edit" type="submit"><i class="fa-solid fa-check"></i></button>
+                        <button class="btn" id="cancel-edit"><i class="fa-solid fa-x"></i></button>
+                    </div>
+                </div>
+            </form>
+
             <div id="item-list"></div>
-        </main>
     </div>
 </body>
 </html>

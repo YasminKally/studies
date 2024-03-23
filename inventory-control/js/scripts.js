@@ -4,6 +4,13 @@ const minimumInput = document.querySelector('#minimum-input');
 const quantityInput = document.querySelector('#quantity-input');
 const itemList = document.querySelector('#item-list');
 
+const editForm = document.querySelector('#edit-form');
+const editNameInput = document.querySelector('#edit-name-input');
+const editMinimumInput = document.querySelector('#edit-minimum-input');
+const editQuantityInput = document.querySelector('#edit-quantity-input');
+const confirmEditBtn = document.querySelector('#confirm-edit');
+const cancelEditBtn = document.querySelector('#cancel-edit');
+
 // Functions
 const saveItem = (name, minimum, quantity, below, save = 1) => {
     const item = document.createElement('div');
@@ -12,7 +19,7 @@ const saveItem = (name, minimum, quantity, below, save = 1) => {
 
     const itemInfo = document.createElement('div');
     itemInfo.classList.add('item-info');
-    const itemName = document.createElement('h4');
+    const itemName = document.createElement('h3');
     itemName.innerText = name;
     itemInfo.appendChild(itemName);
     const itemMinimum = document.createElement('p');   
@@ -60,6 +67,21 @@ const saveItem = (name, minimum, quantity, below, save = 1) => {
     nameInput.focus();
 };
 
+const editItem = (name, minimum, quantity) => {
+    const items = document.querySelectorAll('.item')
+    items.forEach((item) => {
+        let nameValue = item.querySelector('h3');
+        let minimumValue = item.querySelector('p .min');
+        let quantityValue = item.querySelector('p .quant');
+
+        if (nameValue.innerText !== name || minimumValue.innerText !== minimum || quantityValue.innerText !== quantity) {
+            nameValue.innerText = name;
+            minimumValue.innerText = minimum;
+            quantityValue.innerText = quantity;
+        }
+    })
+};
+
 const checkBelow = (minimum, quantity) => {
     let below;
 
@@ -67,6 +89,12 @@ const checkBelow = (minimum, quantity) => {
     
     return below;
 };
+
+const toggleForms = () => {
+    itemForm.classList.toggle('hide');
+    itemList.classList.toggle('hide');
+    editForm.classList.toggle('hide');
+}; 
 
 // Local Storage
 const getItemsLocalStorage = () => {
@@ -91,7 +119,7 @@ const deleteFromLocalStorage = (itemName) => {
 const updateQuantLocalStorage = (quantity, below) => {
     const items = getItemsLocalStorage();
 
-    items.map((item) => {item.quantity !== quantity ? item.quantity = quantity : null});
+    items.map((item) => {item.quantity !== quantity ? (item.quantity = quantity) : null});
     localStorage.setItem('items', JSON.stringify(items));
 
     items.map((item) => {item.below !== below ? item.below = below : null});
@@ -126,8 +154,8 @@ itemList.addEventListener('click', (e) => {
     let itemMinimum;
     let itemQuantity;
 
-    if (parentEl && parentEl.querySelector('.item-info').querySelector('h4')) {
-        itemName = parentEl.querySelector('.item-info').querySelector('h4').innerText || '';
+    if (parentEl && parentEl.querySelector('.item-info').querySelector('h3')) {
+        itemName = parentEl.querySelector('.item-info').querySelector('h3').innerText || '';
         itemMinimum = parentEl.querySelector('.item-info').querySelector('p .min').innerText || '';
         itemQuantity = parentEl.querySelector('.item-info').querySelector('p .quant').innerText || '';
     } 
@@ -154,11 +182,41 @@ itemList.addEventListener('click', (e) => {
         updateQuantLocalStorage(itemQuantity, below);
     }
 
+    if (targetEl.classList.contains('edit-btn')) {
+        toggleForms();
+
+        editNameInput.value = itemName;
+        editMinimumInput.value = itemMinimum;
+        editQuantityInput.value = itemQuantity;
+
+        editNameInput.focus();
+    }
+
     if (targetEl.classList.contains('delete-btn')) {
         parentEl.remove();
 
         deleteFromLocalStorage(itemName);
     }
+});
+
+cancelEditBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+
+    toggleForms();
+});
+
+editForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    const editNameValue = editNameInput.value;
+    const editMinimumValue = editMinimumInput.value;
+    const editQuantityValue = editQuantityInput.value;
+
+    if (editNameValue, editMinimumValue, editQuantityValue) {
+        editItem(editNameValue, editMinimumValue, editQuantityValue);
+    }
+
+    toggleForms();
 });
 
 // Init App
