@@ -7,4 +7,5 @@
     <li><a href="https://yasminkally.github.io/studies/weather-app/index.html">Weather App</a></li>
     <li><a href="https://yasminkally.github.io/studies/pokedex/index.html">Pokedex</a></li>
     <li><a href="https://yasminkally.github.io/studies/timer/index.html">Timer</a></li>
+    <li><a href="https://yasminkally.github.io/studies/inventory-control/index.html">Inventory Control</a></li>
 </ul>
