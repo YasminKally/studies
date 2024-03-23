@@ -5,7 +5,7 @@ const quantityInput = document.querySelector('#quantity-input');
 const itemList = document.querySelector('#item-list');
 
 // Functions
-const saveItem = (name, minimum, quantity, below = 0, save = 1) => {
+const saveItem = (name, minimum, quantity, below, save = 1) => {
     const item = document.createElement('div');
     item.classList.add('item');
     below = checkBelow(minimum, quantity);
@@ -63,11 +63,7 @@ const saveItem = (name, minimum, quantity, below = 0, save = 1) => {
 const checkBelow = (minimum, quantity) => {
     let below;
 
-    if (quantity < minimum) {
-        below = 1;
-    } else {
-        below = 0;
-    }
+    (quantity < minimum) ? below = 1 : below = 0;
     
     return below;
 };
@@ -90,6 +86,16 @@ const deleteFromLocalStorage = (itemName) => {
     const filteredItems = items.filter((item) => item.name != itemName);
     
     localStorage.setItem('items', JSON.stringify(filteredItems))
+};
+
+const updateQuantLocalStorage = (quantity, below) => {
+    const items = getItemsLocalStorage();
+
+    items.map((item) => {item.quantity !== quantity ? item.quantity = quantity : null});
+    localStorage.setItem('items', JSON.stringify(items));
+
+    items.map((item) => {item.below !== below ? item.below = below : null});
+    localStorage.setItem('items', JSON.stringify(items));
 };
 
 const loadItems = () => {
@@ -130,26 +136,22 @@ itemList.addEventListener('click', (e) => {
         itemQuantity++;
         let below = checkBelow(itemMinimum, itemQuantity);
 
-        if (below) {
-            parentEl.classList.add('below');
-        } else {
-            parentEl.classList.remove('below');
-        }
+        (below) ? parentEl.classList.add('below') : parentEl.classList.remove('below');
 
         parentEl.querySelector('p .quant').innerText = itemQuantity;
+
+        updateQuantLocalStorage(itemQuantity, below);
     }
 
     if (targetEl.classList.contains('decrease-btn')) {
         itemQuantity--;
         let below = checkBelow(itemMinimum, itemQuantity);
 
-        if (below) {
-            parentEl.classList.add('below');
-        } else {
-            parentEl.classList.remove('below');
-        }
+        (below) ? parentEl.classList.add('below') : parentEl.classList.remove('below');
 
         parentEl.querySelector('p .quant').innerText = itemQuantity;
+
+        updateQuantLocalStorage(itemQuantity, below);
     }
 
     if (targetEl.classList.contains('delete-btn')) {
@@ -159,4 +161,5 @@ itemList.addEventListener('click', (e) => {
     }
 });
 
+// Init App
 loadItems();
