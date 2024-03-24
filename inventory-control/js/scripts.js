@@ -59,6 +59,10 @@ const saveItem = (name, minimum, quantity, save = 1) => {
     itemEl = item;
     checkBelow(Number(minimum), Number(quantity))
 
+    if (save) {
+        saveToLocalStorage({name, minimum, quantity});
+    }
+
     nameInput.value = '';
     minimumInput.value = '';
     quantityInput.value = '';
@@ -73,14 +77,20 @@ const editItem = (newName, newMinimum, newQuantity) => {
 
     if (nameValue.innerText === oldItemName) {
         nameValue.innerText = newName;
+
+        editItemNameLocalStorage(oldItemName, newName);
     }
 
     if (minimumValue.innerText === oldItemMinimum) {
         minimumValue.innerText = newMinimum;
+
+        editItemMinimumLocalStorage(oldItemMinimum, newMinimum);
     }
 
     if (quantityValue.innerText === oldItemQuantity) {
         quantityValue.innerText = newQuantity;
+
+        editItemQuantityLocalStorage(oldItemQuantity, newQuantity);
     }
 
     checkBelow(Number(newMinimum), Number(newQuantity));
@@ -96,7 +106,6 @@ const toggleForms = () => {
     editForm.classList.toggle('hide');
 }; 
 
-// Local Storage
 
 // Events
 itemForm.addEventListener('submit', (e) => {
@@ -128,20 +137,26 @@ itemList.addEventListener('click', (e) => {
         itemQuantity++;
         
         itemEl = parentEl;
+        itemInfoEl = parentEl.querySelector('.item-info');
 
         checkBelow(itemMinimum, itemQuantity, itemEl)
 
         parentEl.querySelector('p .quant').innerText = itemQuantity;
+
+        updateItemQuantLocalStorage(itemQuantity);
     }
 
     if (targetEl.classList.contains('decrease-btn')) {
         itemQuantity--;
 
         itemEl = parentEl;
+        itemInfoEl = parentEl.querySelector('.item-info');
 
         checkBelow(itemMinimum, itemQuantity, itemEl)
 
         parentEl.querySelector('p .quant').innerText = itemQuantity;
+
+        updateItemQuantLocalStorage(itemQuantity);
     }
 
     if (targetEl.classList.contains('edit-btn')) {
@@ -162,6 +177,10 @@ itemList.addEventListener('click', (e) => {
 
     if (targetEl.classList.contains('delete-btn')) {
         parentEl.remove();
+
+        itemEl = parentEl.querySelector('.item-info');
+
+        deleteFromLocalStorage(itemEl.querySelector('h3').innerText);
     }
 });
 
@@ -185,4 +204,63 @@ editForm.addEventListener('submit', (e) => {
     toggleForms();
 });
 
+// Local Storage
+const getItemsLocalStorage = () => {
+    const items = JSON.parse(localStorage.getItem('items')) || [];
+
+    return items;
+};
+
+const saveToLocalStorage = (item) => {
+    const items = getItemsLocalStorage();
+
+    items.push(item);
+    localStorage.setItem('items', JSON.stringify(items));
+};
+
+const updateItemQuantLocalStorage = (newQuantity) => {
+    const items = getItemsLocalStorage();
+
+    items.map((item) => {item.name === itemInfoEl.querySelector('h3').innerText ? (item.quantity = newQuantity) : null});
+    localStorage.setItem('items', JSON.stringify(items));
+};
+
+const editItemNameLocalStorage = (oldNameValue, newNameValue) => {
+    const items = getItemsLocalStorage();
+
+    items.map((item) => {item.name === oldNameValue ? (item.name = newNameValue) : null})
+    localStorage.setItem('items', JSON.stringify(items))
+};
+
+const editItemMinimumLocalStorage = (oldMinimumValue, newMinimumValue) => {
+    const items = getItemsLocalStorage();
+
+    items.map((item) => {item.minimum === oldMinimumValue ? (item.minimum = newMinimumValue) : null})
+    localStorage.setItem('items', JSON.stringify(items))
+};
+
+const editItemQuantityLocalStorage = (oldQuantityValue, newQuantityValue) => {
+    const items = getItemsLocalStorage();
+
+    items.map((item) => {item.quantity === oldQuantityValue ? (item.quantity = newQuantityValue) : null})
+    localStorage.setItem('items', JSON.stringify(items))
+};
+
+const deleteFromLocalStorage = (itemName) => {
+    const items = getItemsLocalStorage();
+
+    const filteredItems = items.filter((item) => item.name != itemName);
+    
+    localStorage.setItem('items', JSON.stringify(filteredItems))
+};
+
+const loadItemsFromLocalStorage = () => {
+    const items = getItemsLocalStorage();
+    
+    items.forEach((item) => {
+        saveItem(item.name, item.minimum, item.quantity, 0);
+    });
+};
+
 // Init App
+loadItemsFromLocalStorage();
