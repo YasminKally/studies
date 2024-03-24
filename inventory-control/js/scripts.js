@@ -8,8 +8,11 @@ const editForm = document.querySelector('#edit-form');
 const editNameInput = document.querySelector('#edit-name-input');
 const editMinimumInput = document.querySelector('#edit-minimum-input');
 const editQuantityInput = document.querySelector('#edit-quantity-input');
-const confirmEditBtn = document.querySelector('#confirm-edit');
 const cancelEditBtn = document.querySelector('#cancel-edit');
+
+let oldItemName;
+let oldItemMinimum;
+let oldItemQuantity;
 
 // Functions
 const saveItem = (name, minimum, quantity, below, save = 1) => {
@@ -56,10 +59,6 @@ const saveItem = (name, minimum, quantity, below, save = 1) => {
         item.classList.add('below');
     }
 
-    if (save) {
-        saveToLocalStorage({name, minimum, quantity, below});
-    }
-
     nameInput.value = '';
     minimumInput.value = '';
     quantityInput.value = '';
@@ -67,19 +66,26 @@ const saveItem = (name, minimum, quantity, below, save = 1) => {
     nameInput.focus();
 };
 
-const editItem = (name, minimum, quantity) => {
-    const items = document.querySelectorAll('.item')
+const editItem = (newName, newMinimum, newQuantity) => {
+    const items = document.querySelectorAll('.item');
+    
     items.forEach((item) => {
         let nameValue = item.querySelector('h3');
         let minimumValue = item.querySelector('p .min');
         let quantityValue = item.querySelector('p .quant');
 
-        if (nameValue.innerText !== name || minimumValue.innerText !== minimum || quantityValue.innerText !== quantity) {
-            nameValue.innerText = name;
-            minimumValue.innerText = minimum;
-            quantityValue.innerText = quantity;
+        if (nameValue.innerText === oldItemName) {
+            nameValue.innerText = newName;
         }
-    })
+
+        if (minimumValue.innerText === oldItemMinimum) {
+            minimumValue.innerText = newMinimum;
+        }
+
+        if (quantityValue.innerText === oldItemQuantity) {
+            quantityValue.innerText = newQuantity;
+        }
+    });
 };
 
 const checkBelow = (minimum, quantity) => {
@@ -97,42 +103,6 @@ const toggleForms = () => {
 }; 
 
 // Local Storage
-const getItemsLocalStorage = () => {
-    const items = JSON.parse(localStorage.getItem('items')) || [];
-    return items;
-};
-
-const saveToLocalStorage = (item) => {
-    const items = getItemsLocalStorage();
-
-    items.push(item);
-    localStorage.setItem('items', JSON.stringify(items));
-};
-
-const deleteFromLocalStorage = (itemName) => {
-    const items = getItemsLocalStorage();
-    const filteredItems = items.filter((item) => item.name != itemName);
-    
-    localStorage.setItem('items', JSON.stringify(filteredItems))
-};
-
-const updateQuantLocalStorage = (quantity, below) => {
-    const items = getItemsLocalStorage();
-
-    items.map((item) => {item.quantity !== quantity ? (item.quantity = quantity) : null});
-    localStorage.setItem('items', JSON.stringify(items));
-
-    items.map((item) => {item.below !== below ? item.below = below : null});
-    localStorage.setItem('items', JSON.stringify(items));
-};
-
-const loadItems = () => {
-    const items = getItemsLocalStorage();
-
-    items.forEach((item) => {
-        saveItem(item.name, item.minimum, item.quantity, item.below, 0);
-    });
-};
 
 // Events
 itemForm.addEventListener('submit', (e) => {
@@ -167,8 +137,6 @@ itemList.addEventListener('click', (e) => {
         (below) ? parentEl.classList.add('below') : parentEl.classList.remove('below');
 
         parentEl.querySelector('p .quant').innerText = itemQuantity;
-
-        updateQuantLocalStorage(itemQuantity, below);
     }
 
     if (targetEl.classList.contains('decrease-btn')) {
@@ -178,8 +146,6 @@ itemList.addEventListener('click', (e) => {
         (below) ? parentEl.classList.add('below') : parentEl.classList.remove('below');
 
         parentEl.querySelector('p .quant').innerText = itemQuantity;
-
-        updateQuantLocalStorage(itemQuantity, below);
     }
 
     if (targetEl.classList.contains('edit-btn')) {
@@ -189,13 +155,15 @@ itemList.addEventListener('click', (e) => {
         editMinimumInput.value = itemMinimum;
         editQuantityInput.value = itemQuantity;
 
+        oldItemName = itemName;
+        oldItemMinimum = itemMinimum;
+        oldItemQuantity = itemQuantity;
+
         editNameInput.focus();
     }
 
     if (targetEl.classList.contains('delete-btn')) {
         parentEl.remove();
-
-        deleteFromLocalStorage(itemName);
     }
 });
 
@@ -208,16 +176,15 @@ cancelEditBtn.addEventListener('click', (e) => {
 editForm.addEventListener('submit', (e) => {
     e.preventDefault();
 
-    const editNameValue = editNameInput.value;
-    const editMinimumValue = editMinimumInput.value;
-    const editQuantityValue = editQuantityInput.value;
+    const newName = editNameInput.value;
+    const newMinimum = editMinimumInput.value;
+    const newQuantity = editQuantityInput.value;
 
-    if (editNameValue, editMinimumValue, editQuantityValue) {
-        editItem(editNameValue, editMinimumValue, editQuantityValue);
+    if (newName || newMinimum || newQuantity) {
+        editItem(newName, newMinimum, newQuantity);
     }
 
     toggleForms();
 });
 
 // Init App
-loadItems();
