@@ -13,12 +13,13 @@ const cancelEditBtn = document.querySelector('#cancel-edit');
 let oldItemName;
 let oldItemMinimum;
 let oldItemQuantity;
+let itemEl;
+let itemInfoEl;
 
 // Functions
-const saveItem = (name, minimum, quantity, below, save = 1) => {
+const saveItem = (name, minimum, quantity, save = 1) => {
     const item = document.createElement('div');
     item.classList.add('item');
-    below = checkBelow(minimum, quantity);
 
     const itemInfo = document.createElement('div');
     itemInfo.classList.add('item-info');
@@ -55,9 +56,8 @@ const saveItem = (name, minimum, quantity, below, save = 1) => {
 
     itemList.appendChild(item);
 
-    if (below) {
-        item.classList.add('below');
-    }
+    itemEl = item;
+    checkBelow(Number(minimum), Number(quantity))
 
     nameInput.value = '';
     minimumInput.value = '';
@@ -67,34 +67,28 @@ const saveItem = (name, minimum, quantity, below, save = 1) => {
 };
 
 const editItem = (newName, newMinimum, newQuantity) => {
-    const items = document.querySelectorAll('.item');
-    
-    items.forEach((item) => {
-        let nameValue = item.querySelector('h3');
-        let minimumValue = item.querySelector('p .min');
-        let quantityValue = item.querySelector('p .quant');
+    let nameValue = itemInfoEl.querySelector('h3');
+    let minimumValue = itemInfoEl.querySelector('p .min');
+    let quantityValue = itemInfoEl.querySelector('p .quant');
 
-        if (nameValue.innerText === oldItemName) {
-            nameValue.innerText = newName;
-        }
+    if (nameValue.innerText === oldItemName) {
+        nameValue.innerText = newName;
+    }
 
-        if (minimumValue.innerText === oldItemMinimum) {
-            minimumValue.innerText = newMinimum;
-        }
+    if (minimumValue.innerText === oldItemMinimum) {
+        minimumValue.innerText = newMinimum;
+    }
 
-        if (quantityValue.innerText === oldItemQuantity) {
-            quantityValue.innerText = newQuantity;
-        }
-    });
+    if (quantityValue.innerText === oldItemQuantity) {
+        quantityValue.innerText = newQuantity;
+    }
+
+    checkBelow(Number(newMinimum), Number(newQuantity));
 };
 
 const checkBelow = (minimum, quantity) => {
-    let below;
-
-    (quantity < minimum) ? below = 1 : below = 0;
-    
-    return below;
-};
+    (quantity < minimum) ? itemEl.classList.add('below') : itemEl.classList.remove('below');
+}
 
 const toggleForms = () => {
     itemForm.classList.toggle('hide');
@@ -132,18 +126,20 @@ itemList.addEventListener('click', (e) => {
 
     if (targetEl.classList.contains('increase-btn')) {
         itemQuantity++;
-        let below = checkBelow(itemMinimum, itemQuantity);
+        
+        itemEl = parentEl;
 
-        (below) ? parentEl.classList.add('below') : parentEl.classList.remove('below');
+        checkBelow(itemMinimum, itemQuantity, itemEl)
 
         parentEl.querySelector('p .quant').innerText = itemQuantity;
     }
 
     if (targetEl.classList.contains('decrease-btn')) {
         itemQuantity--;
-        let below = checkBelow(itemMinimum, itemQuantity);
 
-        (below) ? parentEl.classList.add('below') : parentEl.classList.remove('below');
+        itemEl = parentEl;
+
+        checkBelow(itemMinimum, itemQuantity, itemEl)
 
         parentEl.querySelector('p .quant').innerText = itemQuantity;
     }
@@ -155,6 +151,8 @@ itemList.addEventListener('click', (e) => {
         editMinimumInput.value = itemMinimum;
         editQuantityInput.value = itemQuantity;
 
+        itemEl = parentEl;
+        itemInfoEl = parentEl.querySelector('.item-info');
         oldItemName = itemName;
         oldItemMinimum = itemMinimum;
         oldItemQuantity = itemQuantity;
