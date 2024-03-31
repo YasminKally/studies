@@ -1,119 +1,153 @@
 @charset "UTF-8";
 
 /* Geral */
+:root {
+  --gray: #1f1f1f;
+  --white: #fdfdfd;
+}
+
+.light {
+  --text: var(--gray);
+  --bg: var(--white);
+}
+
+.dark {
+  --text: var(--white);
+  --bg: var(--gray);
+}
+
 * {
-    margin: 0;
-    padding: 0;
-    font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  padding: 0;
+  font-family: Arial, Helvetica, sans-serif;
 }
 
 body {
-    background-color: #1f1f1f;
-    color: #fdfdfd;
-    display: flex;
-    justify-content: center;
-    height: 100vh;
+  background-color: var(--bg);
+  color: var(--text);
+  display: flex;
+  justify-content: center;
+  height: 100vh;
 }
 
 button {
-    width: 3rem;
-    height: 3rem;
-    padding: .4rem;
-    border: none;
-    background-color: #333;
-    color: #fdfdfd; 
-    border-radius: 5px;
-    transition: .3s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  padding: 0.4rem;
+  border: none;
+  background-color: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--text);
+  border-radius: 5px;
+  transition: 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 button:hover {
-    background-color: #fdfdfd;
-    color: #1f1f1f;
+  background-color: var(--text);
+  color: var(--bg);
 }
 
 button i {
-    pointer-events: none;
+  pointer-events: none;
 }
 
 .below {
-    background-color: #ff00004d;
+  background-color: #ff00009c;
 }
 
 .hide {
-    display: none;
+  display: none;
 }
 
-#container {
-    width: 80%;
-    max-width: 400px;
-    height: fit-content;
-    margin-top: 2rem;
-    padding: 2rem;
-    display: flex;
-    flex-direction: column;
-    border: 2px solid #fdfdfd;
-    border-radius: 15px;
+#app-container {
+  width: 80%;
+  height: fit-content;
+  margin-top: 2rem;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
 }
 
 /* Inventory Header */
-#container header {
-    text-align: center;
-    padding: 2rem;
-    border-bottom: 1px solid #fdfdfd;
+header {
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  padding: 1rem;
+  border-bottom: 1px solid var(--text);
+}
+
+header #switch-theme {
+  border: none;
+  font-size: 1.5rem;
+  align-self: flex-end;
 }
 
 /*Form */
-#item-form p, #edit-form p {
-    text-align: center;
-    font-weight: bold;
-    padding-top: 1rem;
+#item-form p,
+#edit-form p {
+  text-align: center;
+  font-weight: bold;
+  padding-top: 1rem;
 }
 
 #edit-form #edit-buttons {
-    display: flex;
-    gap: .2rem;
+  display: flex;
+  gap: 0.2rem;
 }
 
 .form-control {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: .6rem;
-    padding: 1rem;
-    border-bottom: 1px solid #fdfdfd;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 1rem;
 }
 
 .form-control input {
-    outline: none;
-    padding: .6rem;
-    border: 1px solid #fdfdfd;
-    background-color: #1f1f1f;
-    color: #fdfdfd; 
-    border-radius: 5px;
-    width: 100%;
+  outline: none;
+  padding: 0.6rem;
+  border: 1px solid var(--text);
+  background-color: var(--bg);
+  color: var(--text);
+  border-radius: 5px;
+  width: 100%;
 }
 
-.form-control input[type=number]::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-  }
+.form-control input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+}
 
 /* Item list */
-
-.item {
-    display: flex;
-    align-items: center;
-    gap: .2rem;
-    padding: .6rem;
-    border-bottom: 1px solid #fdfdfd;
+#item-list {
+  box-shadow: 0px -2px 8px #0000004d;
 }
 
-.item-info  {
-    display: flex;
-    flex-direction: column;
-    gap: .2rem;
-    margin-right: auto;
+.item {
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.6rem;
+}
+
+.item-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  margin-right: auto;
+}
+
+@media screen and (min-width: 750px) {
+  .form-control {
+    flex-direction: row;
+    margin-bottom: 1rem;
+  }
+
+  .form-control input {
+    width: 10%;
+  }
 }
