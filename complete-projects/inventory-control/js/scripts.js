@@ -148,7 +148,7 @@ itemList.addEventListener("click", (e) => {
     itemEl = parentEl;
     itemInfoEl = parentEl.querySelector(".item-info");
 
-    checkBelow(itemMinimum, itemQuantity, itemEl);
+    checkBelow(itemMinimum, itemQuantity);
 
     parentEl.querySelector("p .quant").innerText = itemQuantity;
 
@@ -161,7 +161,7 @@ itemList.addEventListener("click", (e) => {
     itemEl = parentEl;
     itemInfoEl = parentEl.querySelector(".item-info");
 
-    checkBelow(itemMinimum, itemQuantity, itemEl);
+    checkBelow(itemMinimum, itemQuantity);
 
     parentEl.querySelector("p .quant").innerText = itemQuantity;
 
@@ -302,17 +302,13 @@ if (theme) {
 
 switchThemeBtn.addEventListener("click", () => {
   if (body.classList.contains("light")) {
-
     body.classList.replace("light", "dark");
     localStorage.setItem("theme", "dark");
     switchThemeBtn.innerHTML = '<i class="fa-regular fa-sun"></i>';
-
   } else if (body.classList.contains("dark")) {
-
     body.classList.replace("dark", "light");
     localStorage.setItem("theme", "light");
     switchThemeBtn.innerHTML = '<i class="fa-regular fa-moon"></i>';
-    
   }
 });
 
