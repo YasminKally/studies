@@ -9,6 +9,7 @@
         <li><a href="https://yasminkally.github.io/studies/complete-projects/tutorials/weather-app/index.html">Weather App</a></li>
         <li><a href="https://yasminkally.github.io/studies/complete-projects/tutorials/pokedex/index.html">Pokedex</a></li>
         <li><a href="https://yasminkally.github.io/studies/complete-projects/tutorials/timer/index.html">Timer</a></li>
+        <li><a href="https://yasminkally.github.io/studies/complete-projects/tutorials/box-shadow-generator/index.html">Box Shadow Generator</a></li>
     </ul>
     <li>By Myself</li>
     <ul>
