@@ -10,8 +10,8 @@
         <li><a href="https://yasminkally.github.io/studies/complete-projects/tutorials/pokedex/index.html">Pokedex</a></li>
         <li><a href="https://yasminkally.github.io/studies/complete-projects/tutorials/timer/index.html">Timer</a></li>
     </ul>
+    <li>By Myself</li>
     <ul>
-        <li>By Myself</li>
         <li><a href="https://yasminkally.github.io/studies/complete-projects/by-myself/inventory-control/index.html">Inventory Control</a></li>
     </ul>
 </ul>
