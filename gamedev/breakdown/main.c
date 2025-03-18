@@ -22,7 +22,7 @@ typedef enum {
 const int screenWidth = 352;
 const int screenHeight = 500;
 const int lines = 8;
-const int rows = 8;
+const int rows = 12;
 
 int collide(Ball* ball, Brick bricks[lines][rows]);
 int moveX(Ball* ball, Brick bricks[lines][rows]);
@@ -65,7 +65,6 @@ int main (void){
     SetTargetFPS(60);
 
     while(!WindowShouldClose()){
-
         // raccket movement
         if(gameState == game){
             if(racket.x - racketSpeed >= 0 && IsKeyDown(KEY_LEFT)){
@@ -101,18 +100,17 @@ int main (void){
             if(ball.shape.x < 0 || ball.shape.x + ball.shape.width > screenWidth){
                 ball.xSpeed *= -1;
             };
+            if(ball.shape.y > screenHeight){
+                gameState = lose;
+                ball.isActive = 0;
+                timer = 0;
+            };
     
             // ball collison with the racket
             if(CheckCollisionRecs(ball.shape, racket)){
                 hitFactor = ((ball.shape.x + ball.shape.width / 2) - (racket.x + racket.width / 2)) / racket.width;
                 ball.xSpeed = hitFactor * 2.7f;
-                ball.ySpeed *= -1;
-            };
-    
-            if(ball.shape.y > screenHeight){
-                gameState = lose;
-                ball.isActive = 0;
-                timer = 0;
+                ball.ySpeed = -2.7f;
             };
         };
 
@@ -121,7 +119,7 @@ int main (void){
         score = 0;
         for(int x = 0; x < lines; x += 1){
             for(int y = 0; y < rows; y += 1){
-                if(bricks[x][y].state){
+                if(bricks[x][y].state && gameState != win){
                     DrawRectangleRec(bricks[x][y].shape, RAYWHITE);
                 } else {
                     score += 100;
@@ -137,8 +135,6 @@ int main (void){
         DrawRectangleRec(racket, RAYWHITE);
         DrawRectangleRec(ball.shape, RAYWHITE);
         switch (gameState){
-            case game:
-                break;
             case win:
                 ClearBackground(BLACK);
                 drawAtMiddle("WIN", 0, 60);
@@ -155,7 +151,7 @@ int main (void){
                     reset(&racket, &ball, bricks);
                     gameState = game;
                     ClearBackground(BLACK);
-                }
+                };
                 break;
         };
         EndDrawing();
@@ -186,15 +182,21 @@ int collide(Ball* ball, Brick bricks[lines][rows]){
 int moveX(Ball* ball, Brick bricks[lines][rows]){
     ball->shape.x += ball->xSpeed;
     if(collide(ball, bricks)){
+        ball->shape.x -= ball->xSpeed;
         ball->xSpeed *= -1;
+        return 1;
     };
+    return 0;
 };
 
 int moveY(Ball* ball, Brick bricks[lines][rows]){
     ball->shape.y += ball->ySpeed;
     if(collide(ball, bricks)){
+        ball->shape.y -= ball->ySpeed;
         ball->ySpeed *= -1;
+        return 1;
     };
+    return 0;
 };
 
 void setBricks(Brick bricks[lines][rows]){
