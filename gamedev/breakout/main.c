@@ -180,7 +180,7 @@ int main (void){
         };
         EndDrawing();
     };
-    hScoreData = fopen("breakout/highScore.txt", "w+");
+    hScoreData = fopen("highScore.txt", "w+");
     fprintf(hScoreData, "%d", highScore);
     fclose(hScoreData);
     CloseWindow();
