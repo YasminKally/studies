@@ -1,6 +1,14 @@
 #include <stdio.h>
 #include <raylib.h>
 
+#ifdef WIN32
+#include <io.h>
+#define F_OK 0
+#define access _access
+#else
+#include <unistd.h>
+#endif
+
 typedef struct {
     Rectangle shape;
     bool state;
@@ -32,8 +40,10 @@ void reset(Rectangle *racket, Ball *ball, Brick bricks[lines][rows]);
 void drawAtMiddle(char* text, int yOffset, int fontSize);
 
 int main (void){
+    FILE *hScoreData;
     char buffer[100];
     int score = 0;
+    int highScore = 0;
     float racketSpeed = 4.3f;
     float timer = 0;
     float hitFactor;
@@ -61,7 +71,13 @@ int main (void){
 
     reset(&racket, &ball, bricks);
 
-    InitWindow(screenWidth, screenHeight, "breakdown");
+    if(access("highScore.txt", F_OK) == 0){
+        hScoreData = fopen("highScore.txt", "r");
+        fscanf(hScoreData, "%d", &highScore);
+        fclose(hScoreData);
+    };
+
+    InitWindow(screenWidth, screenHeight, "breakout");
     SetTargetFPS(60);
 
     while(!WindowShouldClose()){
@@ -132,6 +148,8 @@ int main (void){
         };
         sprintf(buffer, "SCORE: %d", score);
         DrawText(buffer, 2, 12, 20, RAYWHITE);
+        sprintf(buffer, "HIGH-SCORE: %d", highScore);
+        DrawText(buffer, 350 - MeasureText(buffer, 20), 12, 20, RAYWHITE);
         DrawRectangleRec(racket, RAYWHITE);
         DrawRectangleRec(ball.shape, RAYWHITE);
         switch (gameState){
@@ -143,6 +161,9 @@ int main (void){
                     gameState = game;
                     reset(&racket, &ball, bricks);
                 };
+                if(score > highScore){
+                    highScore = score;
+                };
                 break;
             case lose:
                 drawAtMiddle("LOSE", 0, 60);
@@ -152,16 +173,18 @@ int main (void){
                     gameState = game;
                     ClearBackground(BLACK);
                 };
+                if(score > highScore){
+                    highScore = score;
+                };
                 break;
         };
         EndDrawing();
     };
+    hScoreData = fopen("breakout/highScore.txt", "w+");
+    fprintf(hScoreData, "%d", highScore);
+    fclose(hScoreData);
     CloseWindow();
     return 0;
-};
-
-void drawAtMiddle(char* text, int yOffset, int fontSize){
-    DrawText(text, screenWidth / 2 - MeasureText(text, fontSize) / 2, screenHeight / 2 - fontSize / 2 + yOffset, fontSize, RAYWHITE);
 };
 
 int collide(Ball* ball, Brick bricks[lines][rows]){
@@ -222,4 +245,8 @@ void reset(Rectangle *racket, Ball *ball, Brick bricks[lines][rows]){
     ball->isActive = 0;
 
     setBricks(bricks);
+};
+
+void drawAtMiddle(char* text, int yOffset, int fontSize){
+    DrawText(text, screenWidth / 2 - MeasureText(text, fontSize) / 2, screenHeight / 2 - fontSize / 2 + yOffset, fontSize, RAYWHITE);
 };
