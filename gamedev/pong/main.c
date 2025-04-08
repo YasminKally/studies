@@ -87,6 +87,7 @@ int main (void){
     int score1 = 0;
     int score2 = 0;
     int maxScore = 3;
+    int paused = 0;
 
     float racketSpeed = 12.0f;
     float timer = .0f;
@@ -142,11 +143,10 @@ int main (void){
                 };
             };
         // main game loop
-        } else if(currentGameState == game){
+        } else if(currentGameState == game && !paused){
+            // pause
             if(IsKeyPressed(KEY_ESCAPE)){
-                hardReset;
-                reset(&ball, &racket1, &racket2);
-                currentGameState = mainMenu;
+                paused = 1;
             };
 
             // left racket movement
@@ -201,6 +201,37 @@ int main (void){
             if(score1 == maxScore || score2 == maxScore){
                 winOptions = 0;
                 currentGameState = win;
+            };
+        // pause menu
+        } else if(currentGameState == game && paused) {
+            if(IsKeyPressed(KEY_ESCAPE)){
+                paused = 0;
+            };
+            // scroll over menu items
+            if(IsKeyPressed(KEY_W)){
+                winOptions -= 1;
+                if((int)winOptions < 0){
+                    winOptions = 1;
+                };
+            };
+            if(IsKeyPressed(KEY_S)){
+                winOptions += 1;
+                if(winOptions > 1){
+                    winOptions = 0;
+                };
+            };
+            // select highlighted option
+            if(IsKeyPressed(KEY_SPACE)){
+                paused = 0;
+                if(winOptions == 0){
+                    hardReset;
+                    currentGameState = game;
+                };
+                if(winOptions == 1){
+                    hardReset;
+                    menuItem = 0;
+                    currentGameState = mainMenu;
+                };
             };
         // end of match screen
         } else if(currentGameState == win){
@@ -288,6 +319,25 @@ int main (void){
                 DrawText(buffer, screenWidth / 4 - MeasureText(buffer, 20) / 2, 5, 20, PINK);
                 sprintf(buffer, "%d", score2);
                 DrawText(buffer, screenWidth / 4 * 3 - MeasureText(buffer, 20) / 2, 5, 20, PINK);
+
+                // pause menu
+                if(paused){
+                    DrawRectangle(0, 0, screenWidth, screenHeight, (Color){0,0,0, 200});
+                    DrawText("PAUSED", screenWidth / 2 - MeasureText("PAUSED", 30) / 2, screenHeight / 2 - 15, 30, PINK);
+                    // draw each pause menu item
+                    for(int i = 0; i < 2; i += 1){
+                        // highlight selected option
+                        if(i == winOptions){
+                            int size = MeasureText(winItemsText[i], 30);
+                            int x = screenWidth / 2 - size / 2;
+                            int y = screenHeight / 2 + 50 + i * 30;
+                            DrawRectangle(x - 6, y - 1, size + 12, 32, PINK);
+                            DrawText(winItemsText[i], x, y, 30, BLACK);
+                        } else {
+                            DrawText(winItemsText[i], screenWidth / 2 - MeasureText(winItemsText[i], 30) / 2, screenHeight / 2 + 50 + i * 30, 30, PINK);
+                        };
+                    };
+                };
                 break;
             case win:
                 // draw corresponding win message
