@@ -109,6 +109,10 @@ int main (void){
     while(!WindowShouldClose()){
         // main menu
         if(currentGameState == mainMenu){
+            // close game shortcut
+            if(IsKeyPressed(KEY_ESCAPE)){
+                goto finish;
+            };
             // scroll over menu items
             if(IsKeyPressed(KEY_W)){
                 menuItem -= 1;
@@ -225,10 +229,12 @@ int main (void){
                 paused = 0;
                 if(winOptions == 0){
                     hardReset;
+                    reset(&ball, &racket1, &racket2);
                     currentGameState = game;
                 };
                 if(winOptions == 1){
                     hardReset;
+                    reset(&ball, &racket1, &racket2);
                     menuItem = 0;
                     currentGameState = mainMenu;
                 };
