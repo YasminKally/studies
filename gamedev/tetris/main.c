@@ -29,7 +29,7 @@ typedef struct {
     unsigned int grid[GRID_C][GRID_L];
 } State;
 
-
+void drawMenu(void);
 void initGame(State*);
 void updateGame(State*);
 void drawGame(State);
@@ -42,15 +42,25 @@ void dumpGrid(unsigned int [GRID_C][GRID_L]);
 
 int main(void){
     State state;
+    int game = 0;
     
     InitWindow(SCREEN_W, SCREEN_H, "tetris");
     SetTargetFPS(60);
     SetExitKey(0);
-    initGame(&state);
-
+    
     while(!WindowShouldClose()){
-        updateGame(&state);
-        drawGame(state);
+        // wait for game start
+        if(!game && IsKeyPressed(KEY_SPACE)){
+            game = 1;
+            initGame(&state);
+        }
+        // switch between draw states
+        if(game){
+            updateGame(&state);
+            drawGame(state);
+        } else {
+            drawMenu();
+        }
         //dumpGrid(state.grid);
     }
 
@@ -130,10 +140,18 @@ void updateGame(State *state){
     }
 }
 
+void drawMenu(void){
+    BeginDrawing();
+        ClearBackground(BLACK);
+        DrawText("TETRIS", SCREEN_W / 2 - MeasureText("TETRIS", BLOCK_SIZE * 3) / 2, SCREEN_H / 2 - BLOCK_SIZE * 1.5f, BLOCK_SIZE * 3, PURPLE);
+        DrawText("press SPACE to play", SCREEN_W / 2 - MeasureText("press SPACE to play", BLOCK_SIZE) / 2, SCREEN_H / 4 + SCREEN_H / 2 - BLOCK_SIZE / 2, BLOCK_SIZE, PURPLE);
+    EndDrawing();
+}
+
 void drawGame(State state){
     BeginDrawing();
-        // clear frame buffer
-        ClearBackground(BLACK);
+    // clear frame buffer
+    ClearBackground(BLACK);
         // iterate over all grid blocks and draw each one
         for(int c = 0; c < GRID_C; c++){
             for(int l = 0; l < GRID_L; l++){
@@ -155,22 +173,37 @@ void drawGame(State state){
             DrawRectangle(BLOCK_SIZE, BLOCK_SIZE, GRID_C * BLOCK_SIZE, GRID_L * BLOCK_SIZE, (Color){0, 0, 0, 120});
             DrawText("paused", GRID_C * BLOCK_SIZE / 2 + BLOCK_SIZE - MeasureText("paused", 40) / 2, GRID_L * BLOCK_SIZE / 2 + BLOCK_SIZE - 20, 40, RAYWHITE);
         }
+        
+        // draw game over overlay
+        if(state.gameOver){
+            DrawRectangle(BLOCK_SIZE, BLOCK_SIZE, GRID_C * BLOCK_SIZE, GRID_L * BLOCK_SIZE, (Color){0, 0, 0, 120});
+            DrawText("GAME OVER", GRID_C * BLOCK_SIZE / 2 + BLOCK_SIZE - MeasureText("GAME OVER", 24) / 2, GRID_L * BLOCK_SIZE / 2 + BLOCK_SIZE - 12, 24, RAYWHITE);
+            DrawText("press R to restart", GRID_C * BLOCK_SIZE / 2 + BLOCK_SIZE - MeasureText("press R to restart", 20) / 2, GRID_L * BLOCK_SIZE / 2 + BLOCK_SIZE - 10 + BLOCK_SIZE, 20, RAYWHITE);
+        }
 
+        // draw the interface
         int nextPieceX = (SCREEN_W / 4 - BLOCK_SIZE * 1.5f + SCREEN_W / 2) / BLOCK_SIZE;
 
         char buffer[256];
         sprintf(buffer, "points: %d", state.points);
         DrawText(buffer, SCREEN_W / 2 + BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE, RAYWHITE);
-        DrawText("next piece:", SCREEN_W / 2 + BLOCK_SIZE, BLOCK_SIZE * 2, BLOCK_SIZE, RAYWHITE);
+        DrawText("next piece:", SCREEN_W / 2 + BLOCK_SIZE, BLOCK_SIZE * 3, BLOCK_SIZE, RAYWHITE);
         for(int c = 0; c < 3; c++){
             for(int l = 0; l < 3; l++){
                 if(state.nextPiece.bricks[c][l] > 1){
-                    DrawRectangle((nextPieceX + c + 1) * BLOCK_SIZE + 1, (3 + l) * BLOCK_SIZE + 1, BLOCK_SIZE - 2, BLOCK_SIZE - 2, PURPLE);
+                    DrawRectangle((nextPieceX + c + 1) * BLOCK_SIZE + 1, (4 + l) * BLOCK_SIZE + 1, BLOCK_SIZE - 2, BLOCK_SIZE - 2, PURPLE);
                 } else if(state.nextPiece.bricks[c][l]){
-                    DrawRectangle((nextPieceX + c) * BLOCK_SIZE + 1.5f, (4 + l) * BLOCK_SIZE + 1, BLOCK_SIZE - 2, BLOCK_SIZE - 2, PURPLE);
+                    DrawRectangle((nextPieceX + c) * BLOCK_SIZE + 1.5f, (5 + l) * BLOCK_SIZE + 1, BLOCK_SIZE - 2, BLOCK_SIZE - 2, PURPLE);
                 }
             }
         }
+
+        DrawText("controls:", SCREEN_W / 2 + BLOCK_SIZE, BLOCK_SIZE * 8, BLOCK_SIZE, RAYWHITE);
+        DrawText("esc - pause", SCREEN_W / 4 - MeasureText("esc - pause", 20) / 2 + SCREEN_W / 2, BLOCK_SIZE * 10, 20, RAYWHITE);
+        DrawText("right/d - move right", SCREEN_W / 4 - MeasureText("right/d - move right", 20) / 2 + SCREEN_W / 2, BLOCK_SIZE * 11, 20, RAYWHITE);
+        DrawText("left/a - move left", SCREEN_W / 4 - MeasureText("left/a - move left", 20) / 2 + SCREEN_W / 2, BLOCK_SIZE * 12, 20, RAYWHITE);
+        DrawText("up/w - rotate", SCREEN_W / 4 - MeasureText("up/w - rotate", 20) / 2 + SCREEN_W / 2, BLOCK_SIZE * 13, 20, RAYWHITE);
+        DrawText("down/s - fast drop", SCREEN_W / 4 - MeasureText("down/s - fast drop", 20) / 2 + SCREEN_W / 2, BLOCK_SIZE * 14, 20, RAYWHITE);
 
     EndDrawing();
 }
