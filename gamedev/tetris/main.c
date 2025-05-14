@@ -29,26 +29,50 @@ typedef struct {
     unsigned int grid[GRID_C][GRID_L];
 } State;
 
+typedef struct {
+    Sound place;
+    Sound fastPlace;
+    Sound movement;
+    Sound lineDelete;
+    Sound gameover;
+} Sfx;
+
+Music theme;
+
 void drawMenu(void);
 void initGame(State*);
-void updateGame(State*);
+void updateGame(State*, Sfx);
 void drawGame(State);
 int checkCollisionY(State);
 int checkCollisionX(State, int);
-void dropPiece(State*);
-Piece rotatePiece(State);
-void deleteLines(State*);
+void dropPiece(State*, Sfx);
+Piece rotatePiece(State, Sfx);
+void deleteLines(State*, Sfx);
 void dumpGrid(unsigned int [GRID_C][GRID_L]);
 
 int main(void){
     State state;
+    Sfx sfx;
     int game = 0;
     
     InitWindow(SCREEN_W, SCREEN_H, "tetris");
+    InitAudioDevice();
     SetTargetFPS(60);
     SetExitKey(0);
     
+    theme = LoadMusicStream("assets/theme.wav");
+    theme.looping = 1;
+    SetMusicVolume(theme, .3f);
+    PlayMusicStream(theme);
+
+    sfx.place = LoadSound("assets/place.wav");
+    sfx.fastPlace = LoadSound("assets/fastplace.wav");
+    sfx.movement = LoadSound("assets/move.wav");
+    sfx.lineDelete = LoadSound("assets/linedelete.wav");
+    sfx.gameover = LoadSound("assets/gameover.wav");
+    
     while(!WindowShouldClose()){
+        UpdateMusicStream(theme);
         // wait for game start
         if(!game && IsKeyPressed(KEY_SPACE)){
             game = 1;
@@ -56,7 +80,7 @@ int main(void){
         }
         // switch between draw states
         if(game){
-            updateGame(&state);
+            updateGame(&state, sfx);
             drawGame(state);
         } else {
             drawMenu();
@@ -64,6 +88,7 @@ int main(void){
         //dumpGrid(state.grid);
     }
 
+    CloseAudioDevice();
     CloseWindow();
     return 0;
 }
@@ -82,12 +107,14 @@ void initGame(State *state){
     state->dropTickSpeed = .4f;
     state->currentPiece.y = 0;
     state->nextPiece = fetchPiece(GetRandomValue(1, 7));
+    PlayMusicStream(theme);
 }
 
-void updateGame(State *state){
+void updateGame(State *state, Sfx sfx){
     if(state->gameOver){
         // make sure game is not paused on game over
         state->pause = 0;
+        StopMusicStream(theme);
         if(IsKeyPressed(KEY_R)) initGame(state);
     }
     // while game is not over
@@ -95,7 +122,7 @@ void updateGame(State *state){
         // toggle pause
         if(IsKeyPressed(KEY_ESCAPE) && !state->gameOver) state->pause = !state->pause;
         // call the funtion to delete lines if there are lines to delete
-        if(state->linesToDelete) deleteLines(state);
+        if(state->linesToDelete) deleteLines(state, sfx);
         // if game is not paused and there aren't any lines to delete
         if(!state->pause && !state->linesToDelete){
             // if a new piece should be fetched
@@ -103,6 +130,7 @@ void updateGame(State *state){
                 // if the placed piece is already above the grid
                 if(state->currentPiece.y < 0){
                     state->gameOver = 1;
+                    PlaySound(sfx.gameover);
                     return;
                 }
                 // fetch new piece
@@ -114,12 +142,18 @@ void updateGame(State *state){
 
             // check horizontal collisions before moving
             if(!checkCollisionX(*state, (IsKeyDown(KEY_D) || IsKeyDown(KEY_RIGHT)) - (IsKeyDown(KEY_A) || IsKeyDown(KEY_LEFT)))){
-                if(IsKeyPressed(KEY_D) || IsKeyPressed(KEY_RIGHT)) state->currentPiece.x++;
-                if(IsKeyPressed(KEY_A) || IsKeyPressed(KEY_LEFT)) state->currentPiece.x--;
+                if(IsKeyPressed(KEY_D) || IsKeyPressed(KEY_RIGHT)){
+                    state->currentPiece.x++;
+                    PlaySound(sfx.movement);
+                }
+                if(IsKeyPressed(KEY_A) || IsKeyPressed(KEY_LEFT)){
+                    state->currentPiece.x--;
+                    PlaySound(sfx.movement);
+                }
             }
             // rotation
             if(IsKeyPressed(KEY_W) || IsKeyPressed(KEY_UP)){
-                state->currentPiece = rotatePiece(*state);
+                state->currentPiece = rotatePiece(*state, sfx);
             }
 
             // update gravity tick
@@ -132,7 +166,7 @@ void updateGame(State *state){
             }
             // drop piece
             if(state->dropTick >= state->dropTickSpeed){
-                dropPiece(state);
+                dropPiece(state, sfx);
                 state->dropTick = 0;
                 state->linesToDelete = 1;
             }
@@ -253,7 +287,7 @@ int checkOverlap(State state, Piece new){
 }
 
 // drop down a piece
-void dropPiece(State *state){
+void dropPiece(State *state, Sfx sfx){
     unsigned int brick = 0;
 
     // if the no collision is detected, move downwards
@@ -269,13 +303,18 @@ void dropPiece(State *state){
                 }
             }
         }
-        state->toFetch = 1;
+        if(state->dropTickSpeed == .4f){
+            PlaySound(sfx.place);
+        } else {
+            PlaySound(sfx.fastPlace);
+        }
+        state->toFetch = 1;  
     }
 }
 
 // creates a rotated version the current piece.
 // it returns the old one if the rotated version is invalid
-Piece rotatePiece(State state){
+Piece rotatePiece(State state, Sfx sfx){
     Piece old = state.currentPiece;
     Piece new = old;
     // if current piece is an O, return old
@@ -297,10 +336,11 @@ Piece rotatePiece(State state){
         return old;
     }
 
+    PlaySound(sfx.movement);
     return new;
 }
 
-void deleteLines(State *state){
+void deleteLines(State *state, Sfx sfx){
     static int deletedLines = 0;
 
     for(int l = 0; l < GRID_L; l++){
@@ -322,12 +362,15 @@ void deleteLines(State *state){
                     }
                 }
                 state->deleteTick = 0;
+                PlaySound(sfx.lineDelete);
             } else {
                 return;
             }
         }
     }
-    if(deletedLines) state->points += 100 + (deletedLines - 1) * 50;
+    if(deletedLines){
+        state->points += 100 + (deletedLines - 1) * 50;
+    }
     deletedLines = 0;
     state->linesToDelete = 0;
 }
