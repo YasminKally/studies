@@ -3,5 +3,7 @@
     <li>Raylib</li>
     <ul>
         <li>breakout</li>
+        <li>pong</li>
+        <li>tetris</li>
     </ul>
 </ul>
