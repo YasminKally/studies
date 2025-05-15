@@ -4,6 +4,14 @@
 #include <raylib.h>
 #include <raymath.h>
 
+#ifdef WIN32
+#include <io.h>
+#define F_OK 0
+#define access _access
+#else
+#include <unistd.h>
+#endif
+
 #define GRID_C 10
 #define GRID_L 20
 #define BLOCK_SIZE 24
@@ -16,6 +24,7 @@
 
 typedef struct {
     int points;
+    int highScore;
     int gameOver;
     int pause;
     int toFetch;
@@ -46,13 +55,14 @@ void drawGame(State);
 int checkCollisionY(State);
 int checkCollisionX(State, int);
 void dropPiece(State*, Sfx);
-Piece rotatePiece(State, Sfx);
+Piece rotateKickPiece(State, Sfx);
 void deleteLines(State*, Sfx);
 void dumpGrid(unsigned int [GRID_C][GRID_L]);
 
 int main(void){
     State state;
     Sfx sfx;
+    FILE *hScoreData;
     int game = 0;
     
     InitWindow(SCREEN_W, SCREEN_H, "tetris");
@@ -71,6 +81,12 @@ int main(void){
     sfx.lineDelete = LoadSound("assets/linedelete.wav");
     sfx.gameover = LoadSound("assets/gameover.wav");
     
+    if(access("highScore.txt", F_OK) == 0){
+        hScoreData = fopen("highScore.txt", "r");
+        fscanf(hScoreData, "%d", &state.highScore);
+        fclose(hScoreData);
+    }
+    
     while(!WindowShouldClose()){
         UpdateMusicStream(theme);
         // wait for game start
@@ -82,6 +98,9 @@ int main(void){
         if(game){
             updateGame(&state, sfx);
             drawGame(state);
+
+            // exit game if escape is pressed on game over
+            if(IsKeyPressed(KEY_ESCAPE)) break;
         } else {
             drawMenu();
         }
@@ -90,6 +109,9 @@ int main(void){
 
     CloseAudioDevice();
     CloseWindow();
+    hScoreData = fopen("highScore.txt", "w+");
+    fprintf(hScoreData, "%d", state.highScore);
+    fclose(hScoreData);
     return 0;
 }
 
@@ -115,6 +137,7 @@ void updateGame(State *state, Sfx sfx){
         // make sure game is not paused on game over
         state->pause = 0;
         StopMusicStream(theme);
+        if(state->points > state->highScore) state->highScore = state->points;
         if(IsKeyPressed(KEY_R)) initGame(state);
     }
     // while game is not over
@@ -153,7 +176,7 @@ void updateGame(State *state, Sfx sfx){
             }
             // rotation
             if(IsKeyPressed(KEY_W) || IsKeyPressed(KEY_UP)){
-                state->currentPiece = rotatePiece(*state, sfx);
+                state->currentPiece = rotateKickPiece(*state, sfx);
             }
 
             // update gravity tick
@@ -216,36 +239,47 @@ void drawGame(State state){
         }
 
         // draw the interface
+
+        // base X position for the next piece miniature
         int nextPieceX = (SCREEN_W / 4 - BLOCK_SIZE * 1.5f + SCREEN_W / 2) / BLOCK_SIZE;
+        // check how far should the loop iterate
+        int max = state.nextPiece.bricks[1][1] == 2 ? 4 : 3;
 
         char buffer[256];
         sprintf(buffer, "points: %d", state.points);
         DrawText(buffer, SCREEN_W / 2 + BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE, RAYWHITE);
-        DrawText("next piece:", SCREEN_W / 2 + BLOCK_SIZE, BLOCK_SIZE * 3, BLOCK_SIZE, RAYWHITE);
-        for(int c = 0; c < 3; c++){
-            for(int l = 0; l < 3; l++){
-                if(state.nextPiece.bricks[c][l] > 1){
-                    DrawRectangle((nextPieceX + c + 1) * BLOCK_SIZE + 1, (4 + l) * BLOCK_SIZE + 1, BLOCK_SIZE - 2, BLOCK_SIZE - 2, PURPLE);
+        sprintf(buffer, "highscore: %d", state.highScore);
+        DrawText(buffer, SCREEN_W / 2 + BLOCK_SIZE, BLOCK_SIZE * 2, BLOCK_SIZE, RAYWHITE);
+        DrawText("next piece:", SCREEN_W / 2 + BLOCK_SIZE, BLOCK_SIZE * 4, BLOCK_SIZE, RAYWHITE);
+
+        for(int c = 0; c < max; c++){
+            for(int l = 0; l < max; l++){
+                if(state.nextPiece.bricks[c][l] == 2){
+                    DrawRectangle((nextPieceX + l + 1) * BLOCK_SIZE + 1, (5 + c) * BLOCK_SIZE + 1, BLOCK_SIZE - 2, BLOCK_SIZE - 2, PURPLE);
+                } else if(state.nextPiece.bricks[c][l] > 1){
+                    DrawRectangle((nextPieceX + c + 1) * BLOCK_SIZE + 1, (5 + l) * BLOCK_SIZE + 1, BLOCK_SIZE - 2, BLOCK_SIZE - 2, PURPLE);
                 } else if(state.nextPiece.bricks[c][l]){
-                    DrawRectangle((nextPieceX + c) * BLOCK_SIZE + 1.5f, (5 + l) * BLOCK_SIZE + 1, BLOCK_SIZE - 2, BLOCK_SIZE - 2, PURPLE);
+                    DrawRectangle((nextPieceX + c) * BLOCK_SIZE + 1.5f, (6 + l) * BLOCK_SIZE + 1, BLOCK_SIZE - 2, BLOCK_SIZE - 2, PURPLE);
                 }
             }
         }
 
-        DrawText("controls:", SCREEN_W / 2 + BLOCK_SIZE, BLOCK_SIZE * 8, BLOCK_SIZE, RAYWHITE);
-        DrawText("esc - pause", SCREEN_W / 4 - MeasureText("esc - pause", 20) / 2 + SCREEN_W / 2, BLOCK_SIZE * 10, 20, RAYWHITE);
-        DrawText("right/d - move right", SCREEN_W / 4 - MeasureText("right/d - move right", 20) / 2 + SCREEN_W / 2, BLOCK_SIZE * 11, 20, RAYWHITE);
-        DrawText("left/a - move left", SCREEN_W / 4 - MeasureText("left/a - move left", 20) / 2 + SCREEN_W / 2, BLOCK_SIZE * 12, 20, RAYWHITE);
-        DrawText("up/w - rotate", SCREEN_W / 4 - MeasureText("up/w - rotate", 20) / 2 + SCREEN_W / 2, BLOCK_SIZE * 13, 20, RAYWHITE);
-        DrawText("down/s - fast drop", SCREEN_W / 4 - MeasureText("down/s - fast drop", 20) / 2 + SCREEN_W / 2, BLOCK_SIZE * 14, 20, RAYWHITE);
+        DrawText("controls:", SCREEN_W / 2 + BLOCK_SIZE, BLOCK_SIZE * 9, BLOCK_SIZE, RAYWHITE);
+        DrawText("esc - pause", SCREEN_W / 4 - MeasureText("esc - pause", 20) / 2 + SCREEN_W / 2, BLOCK_SIZE * 11, 20, RAYWHITE);
+        DrawText("right/d - move right", SCREEN_W / 4 - MeasureText("right/d - move right", 20) / 2 + SCREEN_W / 2, BLOCK_SIZE * 12, 20, RAYWHITE);
+        DrawText("left/a - move left", SCREEN_W / 4 - MeasureText("left/a - move left", 20) / 2 + SCREEN_W / 2, BLOCK_SIZE * 13, 20, RAYWHITE);
+        DrawText("up/w - rotate", SCREEN_W / 4 - MeasureText("up/w - rotate", 20) / 2 + SCREEN_W / 2, BLOCK_SIZE * 14, 20, RAYWHITE);
+        DrawText("down/s - fast drop", SCREEN_W / 4 - MeasureText("down/s - fast drop", 20) / 2 + SCREEN_W / 2, BLOCK_SIZE * 15, 20, RAYWHITE);
 
     EndDrawing();
 }
 
 // check collisions with the grid floor and blocks right bellow
 int checkCollisionY(State state){
-    for(int c = 0; c < 3; c++){
-        for(int l = 0; l < 3; l++){
+    // check how far should the loop iterate
+    int max = (state.currentPiece.bricks[1][1] == 2 || state.currentPiece.bricks[2][2] == 2) ? 4 : 3;
+    for(int c = 0; c < max; c++){
+        for(int l = 0; l < max; l++){
             // if there is an occupied brick at {c, l}
             if(state.currentPiece.bricks[c][l]){
                 // and right bellow a block is occupied or the position outbounds the grid
@@ -258,8 +292,10 @@ int checkCollisionY(State state){
 
 // check if a piece is horizontally next to another block or the grid walls
 int checkCollisionX(State state, int dir){
-    for(int c = 0; c < 3; c++){
-        for(int l = 0; l < 3; l++){
+    // check how far should the loop iterate
+    int max = (state.currentPiece.bricks[1][1] == 2 || state.currentPiece.bricks[2][2] == 2) ? 4 : 3;
+    for(int c = 0; c < max; c++){
+        for(int l = 0; l < max; l++){
             // if there is an occupied brick at {c, l}
             if(state.currentPiece.bricks[c][l]){
                 // rightside collision
@@ -272,10 +308,42 @@ int checkCollisionX(State state, int dir){
     return 0;
 }
 
+// drop down a piece
+void dropPiece(State *state, Sfx sfx){
+    // current piece's brick value
+    unsigned int brick = 0;
+    // check how far should the loop iterate
+    int max = (state->currentPiece.bricks[1][1] == 2 || state->currentPiece.bricks[2][2] == 2) ? 4 : 3;
+    
+    // if the no collision is detected, move downwards
+    if(!checkCollisionY(*state)){
+        state->currentPiece.y++;
+    // otherwise, place the piece in the grid and set to fetch a new one
+    } else {
+        for(int c = 0; c < max; c++){
+            for(int l = 0; l < max; l++){
+                brick = state->currentPiece.bricks[c][l];
+                if(brick && state->currentPiece.y + l >= 0){
+                    state->grid[c + state->currentPiece.x][l + state->currentPiece.y] = brick;
+                }
+            }
+        }
+        // check at which speed the piece is being placed
+        if(state->dropTickSpeed == .4f){
+            PlaySound(sfx.place);
+        } else {
+            PlaySound(sfx.fastPlace);
+        }
+        state->toFetch = 1;  
+    }
+}
+
 // check if any brick of a piece is overlapping an occupied grid block
 int checkOverlap(State state, Piece new){
-    for(int c = 0; c < 3; c++){
-        for(int l = 0; l < 3; l++){
+    // check how far should the loop iterate
+    int max = (state.currentPiece.bricks[1][1] == 2 || state.currentPiece.bricks[2][2] == 2) ? 4 : 3;
+    for(int c = 0; c < max; c++){
+        for(int l = 0; l < max; l++){
             // if there is an occupied brick at {c, l}
             if(new.bricks[c][l]){
                 // and also an occupied block at this same position on the grid, offseted by the piece position, return true
@@ -286,69 +354,95 @@ int checkOverlap(State state, Piece new){
     return 0;
 }
 
-// drop down a piece
-void dropPiece(State *state, Sfx sfx){
-    unsigned int brick = 0;
-
-    // if the no collision is detected, move downwards
-    if(!checkCollisionY(*state)){
-        state->currentPiece.y++;
-    // otherwise, place the piece in the grid and set to fetch a new one
-    } else {
-        for(int c = 0; c < 3; c++){
-            for(int l = 0; l < 3; l++){
-                brick = state->currentPiece.bricks[c][l];
-                if(brick && state->currentPiece.y + l >= 0){
-                    state->grid[c + state->currentPiece.x][l + state->currentPiece.y] = brick;
-                }
-            }
-        }
-        if(state->dropTickSpeed == .4f){
-            PlaySound(sfx.place);
-        } else {
-            PlaySound(sfx.fastPlace);
-        }
-        state->toFetch = 1;  
-    }
-}
-
-// creates a rotated version the current piece.
-// it returns the old one if the rotated version is invalid
-Piece rotatePiece(State state, Sfx sfx){
-    Piece old = state.currentPiece;
+// returns a rotated version a given piece.
+Piece rotatePiece(Piece old){
     Piece new = old;
     // if current piece is an O, return old
     if(old.bricks[1][1] == 1) return old;
-
-    // hardcoded rotation
-    new.bricks[0][0] = old.bricks[0][2];
-    new.bricks[0][1] = old.bricks[1][2];
-    new.bricks[0][2] = old.bricks[2][2];
-    new.bricks[1][0] = old.bricks[0][1];
-    new.bricks[1][1] = old.bricks[1][1];
-    new.bricks[1][2] = old.bricks[2][1];
-    new.bricks[2][0] = old.bricks[0][0];
-    new.bricks[2][1] = old.bricks[1][0];
-    new.bricks[2][2] = old.bricks[2][0];
-
-    // check if the rotated version is valid
-    if(checkOverlap(state, new)){
-        return old;
+    // hardcoded rotation for 3x3 pieces
+    else if(old.bricks[1][1] == 2 || old.bricks[2][2] == 2){
+        new.bricks[0][0] = old.bricks[0][3];
+        new.bricks[0][1] = old.bricks[1][3];
+        new.bricks[0][2] = old.bricks[2][3];
+        new.bricks[0][3] = old.bricks[3][3];
+        new.bricks[1][0] = old.bricks[0][2];
+        new.bricks[1][1] = old.bricks[1][2];
+        new.bricks[1][2] = old.bricks[2][2];
+        new.bricks[1][3] = old.bricks[3][2];
+        new.bricks[2][0] = old.bricks[0][1];
+        new.bricks[2][1] = old.bricks[1][1];
+        new.bricks[2][2] = old.bricks[2][1];
+        new.bricks[2][3] = old.bricks[3][1];
+        new.bricks[3][0] = old.bricks[0][0];
+        new.bricks[3][1] = old.bricks[1][0];
+        new.bricks[3][2] = old.bricks[2][0];
+        new.bricks[3][3] = old.bricks[3][0];
+    // hardcoded rotation for 4x4 pieces
+    } else {
+        new.bricks[0][0] = old.bricks[0][2];
+        new.bricks[0][1] = old.bricks[1][2];
+        new.bricks[0][2] = old.bricks[2][2];
+        new.bricks[1][0] = old.bricks[0][1];
+        new.bricks[1][1] = old.bricks[1][1];
+        new.bricks[1][2] = old.bricks[2][1];
+        new.bricks[2][0] = old.bricks[0][0];
+        new.bricks[2][1] = old.bricks[1][0];
+        new.bricks[2][2] = old.bricks[2][0];
     }
-
-    PlaySound(sfx.movement);
+    
     return new;
 }
 
+// rotates the current piece and attempts to place it by "kicking" it to the sides 
+Piece rotateKickPiece(State state, Sfx sfx){
+    Piece old = state.currentPiece;
+    Piece new = rotatePiece(old);
+    // check if the rotated version is valid
+    if(checkOverlap(state, new)){
+        // attempt to rotate at max three times
+        for(int i = 0; i < 3; i++){
+            // iterate over every kick variation
+            for(int x = -1; x < 2; x++){
+                for(int y = 0; y < 2; y++){
+                    // update kicked position
+                    new.x = old.x + x;
+                    new.y = old.y + y;
+                    if(!checkOverlap(state, new)){
+                        PlaySound(sfx.movement);
+                        return new;
+                    }
+                }
+            }
+            // reset kicked position
+            new.x = old.x;
+            new.y = old.y;
+            new = rotatePiece(new);
+            if(!checkOverlap(state, new)){
+                PlaySound(sfx.movement);
+                return new;
+            }
+        }
+    } else {
+        PlaySound(sfx.movement);
+        return new;
+    }
+
+    return old;
+}
+
+// checks for completed lines and then delete them, pulling the grid down
 void deleteLines(State *state, Sfx sfx){
     static int deletedLines = 0;
 
+    // iterate over entire grid
     for(int l = 0; l < GRID_L; l++){
         int count = 0;
         for(int c = 0; c < GRID_C; c++){
             if(state->grid[c][l]) count++;
         }
+        // if number of blocks in the current line is equal to the line size (i.e. completed)
         if(count == GRID_C){
+            // delayed countdown to deletion
             state->deleteTick += GetFrameTime();
             if(state->deleteTick >= state->deleteTickSpeed){
                 deletedLines++;
