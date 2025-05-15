@@ -98,9 +98,8 @@ int main(void){
         if(game){
             updateGame(&state, sfx);
             drawGame(state);
-
             // exit game if escape is pressed on game over
-            if(IsKeyPressed(KEY_ESCAPE)) break;
+            if(IsKeyPressed(KEY_ESCAPE) && state.gameOver) break;
         } else {
             drawMenu();
         }
@@ -347,7 +346,7 @@ int checkOverlap(State state, Piece new){
             // if there is an occupied brick at {c, l}
             if(new.bricks[c][l]){
                 // and also an occupied block at this same position on the grid, offseted by the piece position, return true
-                if(state.grid[c + new.x][l + new.y] || new.x + c < 0 || new.x + c == GRID_C) return 1;
+                if(state.grid[c + new.x][l + new.y] || new.x + c < 0 || new.x + c >= GRID_C || new.y + l >= GRID_L) return 1;
             }
         }
     }
