@@ -1,8 +1,13 @@
-hspd = 0;
-vspd = 0;
-spd = 4;
-grav = .3;
+event_inherited();
+
 jstr = -7;
+
+dmg = false;
+dmgTime = gameSpeed * .5;
+dmgTimer = 0;
+
+invTime = gameSpeed;
+invTimer = 0;
 
 inputs = {
 	left : ord("A"),

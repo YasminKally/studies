@@ -6,7 +6,6 @@ if(_xCol){
 	if(hspd > 0){
 		x = _xCol.bbox_left + (x - bbox_right);
 	}
-	
 	// left
 	if(hspd < 0){
 		x = _xCol.bbox_right + (x - bbox_left);
@@ -25,7 +24,6 @@ if(_yCol){
 	if(vspd > 0){
 		y = _yCol.bbox_top + (y - bbox_bottom)
 	}
-	
 	// up
 	if(vspd < 0){
 		y = _yCol.bbox_bottom + (y - bbox_top)
