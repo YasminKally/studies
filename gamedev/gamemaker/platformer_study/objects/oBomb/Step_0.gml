@@ -1,5 +1,8 @@
 // gravity exists
 vspd += grav;
+if(hspd != 0){
+	hspd -= hspd * .05;
+}
 
 if(state == "off"){
 	sprite_index = sBomb;
@@ -25,11 +28,19 @@ if(state == "off"){
 	}
 	// checks if the explosion hit the player
 	var _playerHit = instance_place(x, y, oPlayer)
-	if(_playerHit){
+	if(_playerHit && !_playerHit.dmg){
 		with(_playerHit){
 			dmg = true;
+			global.hp--;
 			dmgTimer = dmgTime;
 			invTimer = invTime;
 		}
+	}
+	// explosion activates other bombs;
+	var _bomb = instance_place(x, y, oBomb);
+	// change bomb state to on
+	if(_bomb){
+		_bomb.state = "on";
+		_bomb.boomTimer = gameSpeed;
 	}
 }

@@ -28,8 +28,8 @@
   "nineSlice":null,
   "origin":7,
   "parent":{
-    "name":"etc",
-    "path":"folders/Sprites/enemies/etc.yy",
+    "name":"bomb",
+    "path":"folders/Sprites/enemies/etc/bomb.yy",
   },
   "preMultiplyAlpha":false,
   "resourceType":"GMSprite",

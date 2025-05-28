@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"sqTransition_out_Events2",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"sqTransition_out_Events2",
+  "parent":{
+    "name":"Scripts",
+    "path":"folders/Scripts.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

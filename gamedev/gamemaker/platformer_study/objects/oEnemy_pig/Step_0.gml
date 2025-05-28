@@ -1,7 +1,7 @@
 if(dead){
 	sprite_index = sEnemy_pig_dead;
 	// making the enemy disapear after the animation
-	if(image_speed <= 0) image_alpha -= .01; 
+	if(image_speed >= 0) image_alpha -= .01; 
 	if(image_alpha <= 0) instance_destroy();
 	// do not execute code if the enemy is dead
 	exit;	
@@ -13,8 +13,24 @@ var _floor = place_meeting(x, y + 1, oFloor);
 if(state == "normal"){
 	// checks if colliding with an off bomb
 	var _bomb = instance_place(x, y, oBomb);
-	if(_bomb){
-		if(_bomb.state == "off"){
+	if(_bomb && _floor){
+		// light the bomb if not picking it
+		if(!pickBomb){
+			if(_bomb.state == "off"){
+				state = "lightingMatch";
+			}
+		// changes to pick the bomb
+		} else {
+			instance_destroy(_bomb);
+			var _newPig = instance_create_layer(x, y, layer, oEnemy_bombPig);
+			_newPig.state = "pick";
+			instance_destroy();
+		}
+	}
+	
+	var _cannon = instance_place(x, y, oCannon);
+	if(_cannon){
+		if(_cannon.state == "idle"){
 			state = "lightingMatch";
 		}
 	}
@@ -45,7 +61,7 @@ if(state == "normal"){
 	if(place_meeting(x + hspd, y, oFloor)) hspd *= -1;
 	// changes direction if can't fall
 	if(!canFall){
-		if(!place_meeting(x + hspd + width / 2 * sign(hspd), y + 1, oFloor)) {
+		if(!place_meeting(x + hspd + (width / 2) * sign(hspd), y + 1, oFloor)) {
 			hspd *= -1;
 		}
 	} else {
@@ -78,8 +94,15 @@ if(state == "normal"){
 		// change bomb state to on
 		if(_bomb){
 			_bomb.state = "on";
+			// choose if will pick or light the next bomb
+			pickBomb = choose(true, false);
 		}
-		// goes back to normal state
+		
+		var _cannon = instance_place(x, y, oCannon);
+		if(_cannon){
+			_cannon.state = "on";
+		}
+		// goes back to normal
 		state = "normal";
 	}
 }
