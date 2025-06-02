@@ -1,8 +1,9 @@
-[gd_scene load_steps=4 format=3 uid="uid://dujxfl6bj7cq3"]
+[gd_scene load_steps=5 format=3 uid="uid://dujxfl6bj7cq3"]
 
 [ext_resource type="Script" uid="uid://cnftgkpioiv5m" path="res://scripts/characters/character.gd" id="1_1bdar"]
 [ext_resource type="Texture2D" uid="uid://d2mpbv8845gv4" path="res://assets/art/characters/shadow.png" id="2_e22cc"]
 [ext_resource type="PackedScene" uid="uid://b47g4b54eh622" path="res://scenes/colliders/hit_box.tscn" id="3_e22cc"]
+[ext_resource type="PackedScene" uid="uid://o3m1qesbrpy1" path="res://scenes/colliders/hurt_box.tscn" id="4_2qjml"]
 
 [node name="character" type="CharacterBody2D"]
 collision_layer = 0
@@ -22,4 +23,7 @@ offset = Vector2(-7, 0)
 
 [node name="HitBox" parent="." instance=ExtResource("3_e22cc")]
 
+[node name="HurtBox" parent="." instance=ExtResource("4_2qjml")]
+
 [editable path="HitBox"]
+[editable path="HurtBox"]
