@@ -4,17 +4,20 @@ extends CharacterBody2D
 const GRAVITY := 600.0
 
 @export var damage: int
+@export var duration_grounded: float
 @export var jump_intensity: float
 @export var knockback_intensity: float
+@export var knockdown_intensity: float
 @export var max_health: int
 @export var speed: float
 
 @onready var animation_player := $AnimationPlayer
 @onready var character_sprite := $CharacterSprite
+@onready var collision_shape := $CollisionShape2D
 @onready var hit_box := $HitBox
 @onready var hurt_box: HurtBox = $HurtBox
 
-enum State {IDLE, WALK, ATTACK, TAKEOFF, JUMP, JUMPKICK, LAND, HURT}
+enum State {IDLE, WALK, ATTACK, TAKEOFF, JUMP, JUMPKICK, LAND, HURT, FALL, GROUNDED}
 
 var anim_map := {
 	State.IDLE: "idle",
@@ -25,12 +28,15 @@ var anim_map := {
 	State.JUMPKICK: "jumpkick",
 	State.LAND: "land",
 	State.HURT: "hurt",
+	State.FALL: "fall",
+	State.GROUNDED: "grounded",
 }
 
 var state = State.IDLE
 var height := 0.0
 var height_speed := 0.0
 var current_health := 0
+var time_since_grounded := Time.get_ticks_msec()
 
 func _ready() -> void:
 	hit_box.area_entered.connect(on_emit_damage.bind())
@@ -40,10 +46,12 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	handle_input()
 	handle_movement()
-	handle_air_time(delta)
 	handle_animations()
+	handle_air_time(delta)
+	handle_grounded()
 	flip_sprites()
 	character_sprite.position = Vector2.UP * height
+	collision_shape.disabled = state == State.GROUNDED
 	move_and_slide()
 
 func handle_movement() -> void:
@@ -56,16 +64,25 @@ func handle_movement() -> void:
 func handle_input() -> void:
 	pass
 
+func handle_grounded() -> void:
+	if state == State.GROUNDED and (Time.get_ticks_msec() - time_since_grounded > duration_grounded):
+		state = State.LAND
+
 func handle_animations() -> void:
 	if animation_player.has_animation(anim_map[state]):
 		animation_player.play(anim_map[state])
 
 func handle_air_time(delta: float) -> void:
-	if state == State.JUMP or state == State.JUMPKICK:
+	if [State. JUMP, State.JUMPKICK, State.FALL].has(state):
 		height += height_speed * delta
 		if height < 0:
 			height = 0
-			state = State.LAND
+			if state == State.FALL:
+				state = State.GROUNDED
+				time_since_grounded = Time.get_ticks_msec()
+			else:
+				state = State.LAND
+			velocity = Vector2.ZERO
 		else:
 			height_speed -= GRAVITY * delta
 
@@ -99,15 +116,18 @@ func on_takeoff_complete() -> void:
 func on_land_complete() -> void:
 	state = State.IDLE
 
-func on_receive_damage(damage: int, direction: Vector2) -> void:
-	current_health = clamp(current_health - damage, 0, max_health)
-	if current_health <= 0:
-		queue_free()
+func on_receive_damage(amount: int, direction: Vector2, hit_type: HurtBox.HitType) -> void:
+	current_health = clamp(current_health - amount, 0, max_health)
+	if current_health == 0 or hit_type == HurtBox.HitType.KNOCKDOWN:
+		state = State.FALL
+		height_speed = knockdown_intensity
 	else:
 		state = State.HURT
-		velocity = direction * knockback_intensity
+	velocity = direction * knockback_intensity
 
-func on_emit_damage(hurt_box: HurtBox) -> void:
-	var direction := Vector2.LEFT if hurt_box.global_position.x < global_position.x else Vector2.RIGHT
-	hurt_box.damage_received.emit(damage, direction)
-	print(hurt_box)
+func on_emit_damage(target_hurt_box: HurtBox) -> void:
+	var hit_type = HurtBox.HitType.NORMAL
+	var direction := Vector2.LEFT if target_hurt_box.global_position.x < global_position.x else Vector2.RIGHT
+	if state == State.JUMPKICK:
+		hit_type = HurtBox.HitType.KNOCKDOWN
+	target_hurt_box.damage_received.emit(damage, direction, hit_type)
