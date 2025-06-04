@@ -17,6 +17,8 @@ offset = Vector2(-7, 0)
 
 [node name="CharacterSprite" type="Sprite2D" parent="."]
 
+[node name="KnifeSprite" type="Sprite2D" parent="."]
+
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
@@ -25,5 +27,12 @@ offset = Vector2(-7, 0)
 
 [node name="HurtBox" parent="." instance=ExtResource("4_2qjml")]
 
+[node name="CollateralHitBox" parent="." instance=ExtResource("3_e22cc")]
+
+[node name="ProjectileAim" type="RayCast2D" parent="."]
+target_position = Vector2(100, 0)
+collision_mask = 0
+
 [editable path="HitBox"]
 [editable path="HurtBox"]
+[editable path="CollateralHitBox"]

@@ -20,14 +20,20 @@ position = Vector2(50, 32)
 [node name="InvisibleWalls" type="Node2D" parent="camera"]
 position = Vector2(-50, -32)
 
-[node name="LeftWall" type="StaticBody2D" parent="camera/InvisibleWalls"]
+[node name="LeftWall" type="AnimatableBody2D" parent="camera/InvisibleWalls"]
 position = Vector2(0, 32)
+collision_layer = 128
+collision_mask = 0
+sync_to_physics = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="camera/InvisibleWalls/LeftWall"]
 shape = SubResource("RectangleShape2D_4wyf3")
 
-[node name="RightWall" type="StaticBody2D" parent="camera/InvisibleWalls"]
+[node name="RightWall" type="AnimatableBody2D" parent="camera/InvisibleWalls"]
 position = Vector2(100, 32)
+collision_layer = 128
+collision_mask = 0
+sync_to_physics = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="camera/InvisibleWalls/RightWall"]
 shape = SubResource("RectangleShape2D_4wyf3")
@@ -37,26 +43,14 @@ y_sort_enabled = true
 
 [node name="player" parent="ActorsContainer" instance=ExtResource("2_rwgxs")]
 position = Vector2(50, 42)
+has_knife = true
 
 [node name="Barrel" parent="ActorsContainer" instance=ExtResource("4_k0juu")]
 position = Vector2(82, 44)
 
 [node name="BasicEnemy" parent="ActorsContainer" node_paths=PackedStringArray("player") instance=ExtResource("5_71j4m")]
-position = Vector2(81, 57)
+position = Vector2(18, 44)
+duration_between_range_attacks = 4000
 player = NodePath("../player")
-
-[node name="BasicEnemy2" parent="ActorsContainer" node_paths=PackedStringArray("player") instance=ExtResource("5_71j4m")]
-position = Vector2(19, 57)
-player = NodePath("../player")
-
-[node name="BasicEnemy3" parent="ActorsContainer" node_paths=PackedStringArray("player") instance=ExtResource("5_71j4m")]
-position = Vector2(13, 38)
-player = NodePath("../player")
-
-[node name="BasicEnemy4" parent="ActorsContainer" node_paths=PackedStringArray("player") instance=ExtResource("5_71j4m")]
-position = Vector2(89, 39)
-player = NodePath("../player")
-
-[node name="BasicEnemy5" parent="ActorsContainer" node_paths=PackedStringArray("player") instance=ExtResource("5_71j4m")]
-position = Vector2(49, 61)
-player = NodePath("../player")
+can_respawn_knife = true
+duration_between_knife_respawn = 25
