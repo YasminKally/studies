@@ -15,6 +15,10 @@ run/main_scene="uid://bxm6oh6rhq5m"
 config/features=PackedStringArray("4.4", "GL Compatibility")
 config/icon="res://icon.svg"
 
+[autoload]
+
+EntityManager="*res://scripts/entity_manager.gd"
+
 [debug]
 
 gdscript/warnings/unused_signal=0
@@ -56,6 +60,7 @@ jump={
 2d_physics/layer_6="EnemyHurtBox"
 2d_physics/layer_7="DestructiblesHurtBox"
 2d_physics/layer_8="InvisibleWalls"
+2d_physics/layer_9="Collectibles"
 
 [rendering]
 

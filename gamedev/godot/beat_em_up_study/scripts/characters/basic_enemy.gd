@@ -21,13 +21,17 @@ func _ready() -> void:
 
 func handle_input() -> void:
 	if player != null and can_move():
-		if can_respawn_knife:
+		if can_respawn_knife or has_knife:
 			goto_range_position()
 		else:
 			goto_melee_position()
 
 func goto_melee_position() -> void:
-	if player_slot == null:
+	if can_pickup_collectible():
+		state = State.PICKUP
+		if player_slot != null:
+			player.free_slot(self)
+	elif player_slot == null:
 		player_slot = player.reserve_slot(self)
 	if player_slot != null:
 		var direction := (player_slot.global_position - global_position).normalized()
@@ -84,7 +88,7 @@ func can_throw() -> bool:
 	return super.can_attack()
 
 func set_heading() -> void:
-	if player == null:
+	if player == null or not can_move():
 		return
 	heading = Vector2.LEFT if position.x > player.position.x else Vector2.RIGHT
 

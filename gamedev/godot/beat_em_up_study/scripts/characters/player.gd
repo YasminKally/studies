@@ -8,28 +8,33 @@ func _ready() -> void:
 	anim_attacks = ["punch", "punch_alt", "kick", "roundkick"]
 
 func handle_input() -> void:
-	var direction := Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down")
-	velocity = direction * speed
+	if can_move():
+		var direction := Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down")
+		velocity = direction * speed
 	if can_attack() and Input.is_action_just_pressed("attack"):
 		if has_knife:
 			state = State.THROW
 		else:
-			state = State.ATTACK
-			if is_last_hit_sucessful:
-				attack_combo_index = (attack_combo_index + 1) % anim_attacks.size()
-				is_last_hit_sucessful = false
-			else: 
-				attack_combo_index = 0
+			if can_pickup_collectible():
+				state = State.PICKUP
+			else:
+				state = State.ATTACK
+				if is_last_hit_sucessful:
+					attack_combo_index = (attack_combo_index + 1) % anim_attacks.size()
+					is_last_hit_sucessful = false
+				else: 
+					attack_combo_index = 0
 	if can_jump() and Input.is_action_just_pressed("jump"):
 		state = State.TAKEOFF
 	if can_jumpkick() and Input.is_action_just_pressed("attack"):
 		state = State.JUMPKICK
 
 func set_heading() -> void:
-	if velocity.x > 0:
-		heading = Vector2.RIGHT
-	elif velocity.x < 0:
-		heading = Vector2.LEFT
+	if can_move():
+		if velocity.x > 0:
+			heading = Vector2.RIGHT
+		elif velocity.x < 0:
+			heading = Vector2.LEFT
 
 func reserve_slot(enemy: BasicEnemy) -> EnemySlot:
 	var available_slots := enemy_slots.filter(

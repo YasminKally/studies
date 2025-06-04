@@ -19,6 +19,8 @@ offset = Vector2(-7, 0)
 
 [node name="KnifeSprite" type="Sprite2D" parent="."]
 
+[node name="WeaponPosition" type="Node2D" parent="KnifeSprite"]
+
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
@@ -32,6 +34,12 @@ offset = Vector2(-7, 0)
 [node name="ProjectileAim" type="RayCast2D" parent="."]
 target_position = Vector2(100, 0)
 collision_mask = 0
+
+[node name="CollectibleSensor" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CollectibleSensor"]
 
 [editable path="HitBox"]
 [editable path="HurtBox"]
