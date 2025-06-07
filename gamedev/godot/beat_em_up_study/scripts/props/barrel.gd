@@ -3,6 +3,7 @@ extends StaticBody2D
 @onready var hurt_box := $HurtBox
 @onready var sprite := $"Sprite2D"
 
+@export var content_type: Collectible.Type
 @export var knockback_intensity: float
 
 const GRAVITY := 600.0
@@ -28,6 +29,8 @@ func on_receive_damage(_damage: int, direction: Vector2, _hit_type: HurtBox.HitT
 		sprite.frame = 1
 		height_speed = knockback_intensity * 2
 		velocity = direction * knockback_intensity
+		EntityManager.spawn_collectible.emit(content_type, Collectible.State.FALL, global_position, Vector2.ZERO, 0.0)
+
 
 func handle_air_time(delta: float) -> void:
 	if state == State.DESTROYED:

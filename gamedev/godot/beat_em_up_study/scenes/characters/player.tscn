@@ -720,14 +720,15 @@ size = Vector2(3, 3)
 collision_layer = 2
 collision_mask = 137
 script = ExtResource("2_76oj4")
+max_duration_between_sucessful_hits = 2000
 can_respawn = true
 damage = 4
 damage_power = 6
+max_health = 30
 duration_grounded = 1000.0
 jump_intensity = 150.0
 knockback_intensity = 10.0
 knockdown_intensity = 70.0
-max_health = 30
 speed = 35.0
 
 [node name="CharacterSprite" parent="." index="1"]

@@ -42,6 +42,8 @@ func _process(delta: float) -> void:
 	collectible_sprite.flip_h = velocity.x < 0
 	collectible_sprite.position = Vector2.UP * height
 	position += velocity * delta
+	monitorable = state == State.GROUNDED
+	hit_box.monitoring = state == State.FLY
 
 func handle_animations() -> void:
 	animation_player.play(anim_map[state])

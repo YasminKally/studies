@@ -1,13 +1,10 @@
-[gd_scene load_steps=10 format=3 uid="uid://bxm6oh6rhq5m"]
+[gd_scene load_steps=7 format=3 uid="uid://bxm6oh6rhq5m"]
 
 [ext_resource type="Script" uid="uid://suhhwtmduydm" path="res://scripts/world.gd" id="1_4wyf3"]
 [ext_resource type="PackedScene" uid="uid://jun7lt70d32k" path="res://scenes/stages/stage.tscn" id="1_nnsk1"]
 [ext_resource type="PackedScene" uid="uid://c5j0vyv1w0ujp" path="res://scenes/characters/player.tscn" id="2_rwgxs"]
 [ext_resource type="Script" uid="uid://bpnsmwvavlnsb" path="res://scripts/actors_container.gd" id="3_4mrxx"]
-[ext_resource type="PackedScene" uid="uid://cpid0xpn38xco" path="res://scenes/props/barrel.tscn" id="4_k0juu"]
-[ext_resource type="PackedScene" uid="uid://dpi78u5ingq43" path="res://scenes/characters/basic_enemy.tscn" id="5_71j4m"]
-[ext_resource type="PackedScene" uid="uid://b6t3p2h1l742d" path="res://scenes/props/knife.tscn" id="6_qfnet"]
-[ext_resource type="PackedScene" uid="uid://kidxrhg3cj5n" path="res://scenes/characters/goon_enemy.tscn" id="7_i7141"]
+[ext_resource type="PackedScene" uid="uid://cblqwciinnigy" path="res://scenes/characters/igor_boss.tscn" id="5_71j4m"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_4wyf3"]
 size = Vector2(6, 64)
@@ -46,20 +43,8 @@ y_sort_enabled = true
 script = ExtResource("3_4mrxx")
 
 [node name="player" parent="ActorsContainer" instance=ExtResource("2_rwgxs")]
-position = Vector2(50, 42)
-has_knife = true
+position = Vector2(12, 44)
 
-[node name="Barrel" parent="ActorsContainer" instance=ExtResource("4_k0juu")]
+[node name="IgorBoss" parent="ActorsContainer" node_paths=PackedStringArray("player") instance=ExtResource("5_71j4m")]
 position = Vector2(82, 44)
-
-[node name="BasicEnemy" parent="ActorsContainer" node_paths=PackedStringArray("player") instance=ExtResource("5_71j4m")]
-position = Vector2(71, 59)
 player = NodePath("../player")
-
-[node name="GoonEnemy" parent="ActorsContainer" node_paths=PackedStringArray("player") instance=ExtResource("7_i7141")]
-position = Vector2(87, 47)
-player = NodePath("../player")
-
-[node name="knife" parent="ActorsContainer" instance=ExtResource("6_qfnet")]
-position = Vector2(71, 52)
-speed = 0.0

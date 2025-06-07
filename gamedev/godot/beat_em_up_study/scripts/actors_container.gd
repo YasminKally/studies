@@ -2,6 +2,7 @@ extends Node2D
 
 var prefab_map := {
 	Collectible.Type.KNIFE: preload("res://scenes/props/knife.tscn"),
+	Collectible.Type.FOOD: preload("res://scenes/props/food.tscn"),
 } 
 
 func _ready() -> void:
@@ -14,4 +15,4 @@ collectible_global_position: Vector2, collectible_direction: Vector2, initial_he
 	collectible.height = initial_height
 	collectible.global_position = collectible_global_position
 	collectible.direction = collectible_direction
-	add_child(collectible)
+	call_deferred("add_child", collectible)
