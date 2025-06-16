@@ -6,6 +6,7 @@
 [node name="GoonEnemy" instance=ExtResource("1_55rrx")]
 damage = 1
 max_health = 15
+type = 2
 duration_grounded = 700.0
 flight_speed = 120.0
 knockdown_intensity = 80.0
