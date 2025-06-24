@@ -1,6 +1,7 @@
-[gd_scene load_steps=6 format=3 uid="uid://bxm6oh6rhq5m"]
+[gd_scene load_steps=7 format=3 uid="uid://bxm6oh6rhq5m"]
 
 [ext_resource type="Script" uid="uid://suhhwtmduydm" path="res://scripts/world.gd" id="1_4wyf3"]
+[ext_resource type="PackedScene" uid="uid://bgnkyd2vagp1t" path="res://scenes/ui/ui.tscn" id="2_71j4m"]
 [ext_resource type="PackedScene" uid="uid://c5j0vyv1w0ujp" path="res://scenes/characters/player.tscn" id="2_rwgxs"]
 [ext_resource type="Script" uid="uid://bpnsmwvavlnsb" path="res://scripts/actors_container.gd" id="3_4mrxx"]
 [ext_resource type="PackedScene" uid="uid://cobl7npw4y2q5" path="res://scenes/stages/stage_01_streets.tscn" id="5_qfnet"]
@@ -11,10 +12,14 @@ size = Vector2(6, 64)
 [node name="world" type="Node2D"]
 script = ExtResource("1_4wyf3")
 
+[node name="UI" parent="." instance=ExtResource("2_71j4m")]
+
 [node name="Stage-01-Streets" parent="." instance=ExtResource("5_qfnet")]
 
 [node name="camera" type="Camera2D" parent="."]
 position = Vector2(50, 32)
+position_smoothing_enabled = true
+position_smoothing_speed = 3.0
 
 [node name="InvisibleWalls" type="Node2D" parent="camera"]
 position = Vector2(-50, -32)
@@ -44,3 +49,6 @@ player = NodePath("player")
 
 [node name="player" parent="ActorsContainer" instance=ExtResource("2_rwgxs")]
 position = Vector2(12, 44)
+
+[editable path="UI"]
+[editable path="UI/UIContainer/EnemyHealthbar"]

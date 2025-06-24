@@ -75,7 +75,7 @@ func _ready() -> void:
 	hurt_box.damage_received.connect(on_receive_damage.bind())
 	collateral_hit_box.area_entered.connect(on_emit_collateral_damage.bind())
 	collateral_hit_box.body_entered.connect(on_wall_hit.bind())
-	current_health = max_health
+	set_health(max_health, type == Character.Type.PLAYER)
 
 func _process(delta: float) -> void:
 	handle_input()
@@ -178,6 +178,8 @@ func can_get_hurt() -> bool:
 func can_pickup_collectible() -> bool:
 	if can_respawn_knife:
 		return false
+	if Time.get_ticks_msec() - time_since_knife_dismiss < duration_between_knife_respawn:
+		return false
 	var collectible_areas := collectible_sensor.get_overlapping_areas()
 	if collectible_areas.size() == 0:
 		return false
@@ -195,7 +197,7 @@ func pickup_collectible() -> void:
 		if collectible.type == Collectible.Type.KNIFE and not has_knife:
 			has_knife = true
 		if collectible.type == Collectible.Type.FOOD:
-			current_health = max_health
+			set_health(max_health, type == Character.Type.PLAYER)
 		collectible.queue_free()
 
 func is_collision_disabled() -> bool:
@@ -230,7 +232,7 @@ func on_receive_damage(amount: int, direction: Vector2, hit_type: HurtBox.HitTyp
 			has_knife = false
 			EntityManager.spawn_collectible.emit(Collectible.Type.KNIFE, Collectible.State.FALL, global_position, Vector2.ZERO, 0.0)
 			time_since_knife_dismiss = Time.get_ticks_msec()
-		current_health = clamp(current_health - amount, 0, max_health)
+		set_health(current_health - amount)
 		if current_health == 0 or hit_type == HurtBox.HitType.KNOCKDOWN:
 			state = State.FALL
 			height_speed = knockdown_intensity
@@ -263,3 +265,8 @@ func on_wall_hit(_wall: AnimatableBody2D) -> void:
 	state = State.FALL
 	height_speed = knockdown_intensity
 	velocity = -velocity / 2.0
+
+func set_health(health: int, emit: bool = true) -> void:
+	current_health = clamp(health, 0, max_health)
+	if emit_signal:
+		DamageManager.health_change.emit(type, current_health, max_health)

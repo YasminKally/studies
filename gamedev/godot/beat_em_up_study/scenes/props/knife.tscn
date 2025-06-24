@@ -111,6 +111,7 @@ size = Vector2(3, 3)
 
 [node name="knife" instance=ExtResource("1_a56y7")]
 monitorable = true
+damage = 5
 knockdown_intensity = 150.0
 
 [node name="CollisionShape2D" parent="." index="0"]

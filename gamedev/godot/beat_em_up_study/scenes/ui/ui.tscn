@@ -1,0 +1,69 @@
+[gd_scene load_steps=5 format=3 uid="uid://bgnkyd2vagp1t"]
+
+[ext_resource type="Script" uid="uid://jfa03fsont6n" path="res://scenes/ui/ui.gd" id="1_g5kmx"]
+[ext_resource type="Texture2D" uid="uid://dd4objqieq035" path="res://assets/art/ui/avatars/avatar-punk.png" id="1_u7n8c"]
+[ext_resource type="PackedScene" uid="uid://ywkrotq213vo" path="res://scenes/ui/healthbar.tscn" id="2_aac20"]
+[ext_resource type="Texture2D" uid="uid://bluux5blw4w4l" path="res://assets/art/ui/avatars/avatar-player.png" id="2_f5cxw"]
+
+[node name="UI" type="CanvasLayer"]
+script = ExtResource("1_g5kmx")
+duration_healthbar_visible = 1000
+
+[node name="UIContainer" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PlayerAvatar" type="TextureRect" parent="UIContainer"]
+layout_mode = 1
+offset_right = 11.0
+offset_bottom = 11.0
+texture = ExtResource("2_f5cxw")
+stretch_mode = 2
+
+[node name="PlayerHealthbar" parent="UIContainer" instance=ExtResource("2_aac20")]
+offset_left = 12.0
+offset_top = 7.0
+offset_right = 42.0
+offset_bottom = 11.0
+
+[node name="EnemyAvatar" type="TextureRect" parent="UIContainer"]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -11.0
+offset_bottom = 11.0
+grow_horizontal = 0
+texture = ExtResource("1_u7n8c")
+stretch_mode = 2
+flip_h = true
+
+[node name="EnemyHealthbar" parent="UIContainer" instance=ExtResource("2_aac20")]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -42.0
+offset_top = 7.0
+offset_right = -12.0
+offset_bottom = 11.0
+grow_horizontal = 0
+is_inverted = true
+
+[node name="WhiteBorder" parent="UIContainer/EnemyHealthbar" index="0"]
+layout_direction = 3
+scale = Vector2(-30, 1)
+
+[node name="ContentBackground" parent="UIContainer/EnemyHealthbar" index="1"]
+layout_direction = 3
+scale = Vector2(-28, 1)
+
+[node name="HealthGauge" parent="UIContainer/EnemyHealthbar" index="2"]
+layout_direction = 3
+scale = Vector2(-28, 1)
+
+[editable path="UIContainer/EnemyHealthbar"]
